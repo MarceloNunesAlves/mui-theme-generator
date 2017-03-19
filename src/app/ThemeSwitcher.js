@@ -18,7 +18,7 @@ const styles = {
     }
 };
 
-export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme }) => (
+export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme, onColorChange }) => (
     <div style={{ margin: '30px' }}>
         <Tabs value={initialTheme} onChange={changeBaseTheme} tabItemContainerStyle={styles.tabs} style={styles.tabsContainer} >
             <Tab label="light" value="light" buttonStyle={styles.tab} />
@@ -30,6 +30,7 @@ export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme }) => (
                 <tr style={{ fontWeight: 500 }}>
                     <td>Key</td>
                     <td>Base Theme</td>
+                    <td>Overwrites</td>
                 </tr>
             </thead>
             <tbody>
@@ -39,6 +40,9 @@ export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme }) => (
                             <td>{key}</td>
                             <td>
                                 <ColorPicker color={theme.palette[key]} />
+                            </td>
+                            <td>
+                                <ColorPicker color={theme.palette[key]} onColorChange={(color) => onColorChange(key, color)} />
                             </td>
                         </tr>
                     )

@@ -28,14 +28,17 @@ export default class Main extends Component {
         });
     };
 
+    handleonColorChange = (key, newValue) => {
+        var palette = Object.assign({}, this.state.palette, { [key]: newValue });
+        this.setState({
+            palette
+        });
+    }
+
     render() {
         let baseTheme = this.state.baseTheme === "dark" ? darkBaseTheme : null;
-        let muiTheme = getMuiTheme({
-            // palette: {
-            //     // accent1Color: deepOrange500,
-            // },
-
-        }, baseTheme);
+        let palette = this.state.palette;
+        let muiTheme = getMuiTheme(baseTheme, { palette });
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
@@ -47,12 +50,16 @@ export default class Main extends Component {
                                     <Components />
                                 </td>
                                 <td style={{ width: '40%', position: 'fixed' }}>
-                                    <ThemeSwitcher initialTheme={this.state.baseTheme} changeBaseTheme={this.handleBaseThemeChange} theme={muiTheme} />
+                                    <ThemeSwitcher
+                                        initialTheme={this.state.baseTheme}
+                                        changeBaseTheme={this.handleBaseThemeChange}
+                                        theme={muiTheme}
+                                        onColorChange={this.handleonColorChange} />
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <a style={{ position: 'fixed', top: 2, right: 5 }}  href="https://github.com/cimdalli/mui-theme-generator">
+                    <a style={{ position: 'fixed', top: 2, right: 5 }} href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />
                     </a>
                 </Paper>

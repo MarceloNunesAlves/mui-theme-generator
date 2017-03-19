@@ -10,9 +10,16 @@ export class ColorPicker extends React.Component {
 
         this.state = {
             displayColorPicker: false,
-            color: ColorHelper.toState(props.color).rgb
+            color: ColorHelper.toState(props.color)
         };
     }
+
+    colorToString = (color) => {
+        if (color.rgb && color.rgb.a !== 1)
+            return `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a})`
+
+        return color.hex;
+    };
 
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
@@ -23,8 +30,10 @@ export class ColorPicker extends React.Component {
     };
 
     handleChange = (color) => {
-        this.setState({ color: color.rgb })
+        this.setState({ color: color })
+        this.props.onColorChange && this.props.onColorChange(this.colorToString(color));
     };
+
 
     render() {
 
@@ -34,7 +43,7 @@ export class ColorPicker extends React.Component {
                     width: '36px',
                     height: '14px',
                     borderRadius: '2px',
-                    background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`,
+                    background: this.colorToString(this.state.color),
                 },
                 swatch: {
                     padding: '5px',
@@ -47,6 +56,7 @@ export class ColorPicker extends React.Component {
                 popover: {
                     position: 'absolute',
                     zIndex: '2',
+                    left: '24%'
                 },
                 cover: {
                     position: 'fixed',
@@ -65,7 +75,7 @@ export class ColorPicker extends React.Component {
                 </div>
                 {this.state.displayColorPicker ? <div style={styles.popover}>
                     <div style={styles.cover} onClick={this.handleClose} />
-                    <SketchPicker color={this.state.color} onChange={this.handleChange} />
+                    <SketchPicker color={this.state.color.rgb} onChange={this.handleChange} />
                 </div> : null}
 
             </div>
