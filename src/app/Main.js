@@ -52,7 +52,7 @@ export default class Main extends Component {
                             </tr>
                         </tbody>
                     </table>
-                    <a style={{ position: 'absolute', top: 2, right: 5 }}  href="https://github.com/cimdalli/mui-theme-generator">
+                    <a style={{ position: 'fixed', top: 2, right: 5 }}  href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />
                     </a>
                 </Paper>
