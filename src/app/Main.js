@@ -46,7 +46,7 @@ export default class Main extends Component {
                                     <Components />
                                 </td>
                                 <td style={{ width: '40%', position: 'fixed' }}>
-                                    <ThemeSwitcher initialTheme={this.state.baseTheme} changeBaseTheme={this.handleBaseThemeChange} />
+                                    <ThemeSwitcher initialTheme={this.state.baseTheme} changeBaseTheme={this.handleBaseThemeChange} theme={muiTheme} />
                                 </td>
                             </tr>
                         </tbody>

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
+import { ColorPicker } from './ColorPicker';
+
 
 const styles = {
     tabsContainer: {
@@ -16,13 +18,33 @@ const styles = {
     }
 };
 
-export const ThemeSwitcher = ({ initialTheme, changeBaseTheme }) => (
+export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme }) => (
     <div style={{ margin: '30px' }}>
         <Tabs value={initialTheme} onChange={changeBaseTheme} tabItemContainerStyle={styles.tabs} style={styles.tabsContainer} >
             <Tab label="light" value="light" buttonStyle={styles.tab} />
             <Tab label="dark" value="dark" buttonStyle={styles.tab} />
         </Tabs>
-        {/*<RaisedButton label="Light theme base" onTouchTap={this.props.changeTheme} />
-                <RaisedButton label="Dark theme base" onTouchTap={this.props.changeTheme} />*/}
+
+        <table style={{ marginTop: 20, fontSize: 16, borderSpacing: 10 }}>
+            <thead>
+                <tr style={{ fontWeight: 500 }}>
+                    <td>Key</td>
+                    <td>Base Theme</td>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    Object.keys(theme.palette).map(key =>
+                        <tr key={key}>
+                            <td>{key}</td>
+                            <td>
+                                <ColorPicker color={theme.palette[key]} />
+                            </td>
+                        </tr>
+                    )
+                }
+            </tbody>
+        </table>
+
     </div>
 );
