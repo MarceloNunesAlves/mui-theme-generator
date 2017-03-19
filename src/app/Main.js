@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
+import IconButton from 'material-ui/IconButton';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -51,6 +52,9 @@ export default class Main extends Component {
                             </tr>
                         </tbody>
                     </table>
+                    <a style={{ position: 'absolute', top: 2, right: 5 }}  href="https://github.com/cimdalli/mui-theme-generator">
+                        <IconButton iconClassName="muidocs-icon-custom-github" />
+                    </a>
                 </Paper>
             </MuiThemeProvider>
         );
