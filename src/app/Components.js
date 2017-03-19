@@ -17,6 +17,7 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import { Menu, MenuItem } from 'material-ui/Menu';
 import Paper from 'material-ui/Paper';
+import Popover from 'material-ui/Popover';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Slider from 'material-ui/Slider';
@@ -35,12 +36,12 @@ import RestoreIcon from 'material-ui/svg-icons/action/restore';
 
 import { orange500, blue500 } from 'material-ui/styles/colors';
 
-import TableExampleComplex from './Table'
+import TableExampleComplex from './TableExampleComplex'
 
 const ComponentWrapper = ({ title, children, style }) => (
     <tr>
-        <td width="100" style={{ paddingRight: 20 }}>{title}</td>
-        <td style={{ ...style, width: '100%' }}>{children}</td>
+        <td style={{ width: 100, padding: 20 }}>{title}</td>
+        <td style={{ width: '100%', paddingLeft: 10, ...style }}>{children}</td>
     </tr>
 );
 
@@ -76,6 +77,7 @@ export default class Components extends Component {
             drawerOpen: false,
             dialogOpen: false,
             snackbarOpen: false,
+            popoverOpen: false,
             dropDownValue: 2
         }
     }
@@ -102,7 +104,17 @@ export default class Components extends Component {
 
     handleCloseSnackbar = () => this.setState({ snackbarOpen: false });
 
-    handleDropDownChange = (event, index, dropDownValue) => this.setState({ dropDownValue });
+    handleChangeDropDown = (event, index, dropDownValue) => this.setState({ dropDownValue });
+
+    handleOpenPopover = (event) => {
+        event.preventDefault();
+        this.setState({
+            popoverOpen: true,
+            anchorEl: event.currentTarget,
+        });
+    };
+
+    handleClosePopover = () => this.setState({ popoverOpen: false });
 
 
     render() {
@@ -257,7 +269,7 @@ export default class Components extends Component {
                     </ComponentWrapper>
 
                     <ComponentWrapper title="DropDown">
-                        <DropDownMenu value={this.state.dropDownValue} onChange={this.handleDropDownChange} openImmediately={true}>
+                        <DropDownMenu value={this.state.dropDownValue} onChange={this.handleChangeDropDown} >
                             <MenuItem value={1} primaryText="Never" />
                             <MenuItem value={2} primaryText="Every Night" />
                             <MenuItem value={3} primaryText="Weeknights" />
@@ -266,9 +278,20 @@ export default class Components extends Component {
                         </DropDownMenu>
                     </ComponentWrapper>
 
-                    <ComponentWrapper title="Menu">
-                        <Paper style={{ display: 'inline-block', borderSpacing: 0 }}>
-                            <Menu desktop={true}>
+                    <ComponentWrapper title="Popover">
+                        <RaisedButton
+                            onTouchTap={this.handleOpenPopover}
+                            label="Popover"
+                        />
+                        <Popover
+                            open={this.state.popoverOpen}
+                            anchorEl={this.state.anchorEl}
+                            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+                            onRequestClose={this.handleClosePopover}
+                        >
+                            {/*<Paper style={{ display: 'inline-block', borderSpacing: 0 }}>*/}
+                            <Menu>
                                 <MenuItem primaryText="Back" />
                                 <MenuItem primaryText="Forward" disabled={true} />
                                 <Divider />
@@ -276,7 +299,7 @@ export default class Components extends Component {
                                 <MenuItem primaryText="Google" disabled={true} />
                                 <MenuItem primaryText="YouTube" />
                             </Menu>
-                        </Paper>
+                        </Popover>
                     </ComponentWrapper>
 
                     <ComponentWrapper title="Slider">
