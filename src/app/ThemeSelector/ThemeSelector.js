@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
-import { ColorPicker } from './ColorPicker';
+import ColorPicker from './ColorPicker';
 
 
 const styles = {
@@ -18,7 +18,7 @@ const styles = {
     }
 };
 
-export const ThemeSwitcher = ({ initialTheme, changeBaseTheme, theme, onColorChange }) => (
+export default ({ initialTheme, changeBaseTheme, theme, onColorChange }) => (
     <div style={{ margin: '30px' }}>
         <Tabs value={initialTheme} onChange={changeBaseTheme} tabItemContainerStyle={styles.tabs} style={styles.tabsContainer} >
             <Tab label="light" value="light" buttonStyle={styles.tab} />

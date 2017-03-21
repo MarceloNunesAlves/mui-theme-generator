@@ -34,9 +34,9 @@ import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
 import RestoreIcon from 'material-ui/svg-icons/action/restore';
 
-import { orange500, blue500 } from 'material-ui/styles/colors';
+import { orange500 } from 'material-ui/styles/colors';
 
-import TableExampleComplex from './TableExampleComplex'
+import ComplexTable from './ComplexTable'
 
 const ComponentWrapper = ({ title, children, style }) => (
     <tr>
@@ -342,7 +342,7 @@ export default class Components extends Component {
                     </ComponentWrapper>
 
                     <ComponentWrapper title="Table">
-                        <TableExampleComplex />
+                        <ComplexTable />
                     </ComponentWrapper>
 
                     <ComponentWrapper title="Tabs">

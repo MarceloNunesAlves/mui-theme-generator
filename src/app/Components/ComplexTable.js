@@ -46,7 +46,7 @@ const tableData = [
     },
 ];
 
-export default class TableExampleComplex extends React.Component {
+export default class ComplexTable extends React.Component {
 
     constructor(props) {
         super(props);

@@ -6,7 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
 import Components from './Components'
-import { ThemeSwitcher } from './ThemeSwitcher'
+import ThemeSelector from '../ThemeSelector/ThemeSelector'
 
 const styles = {
     container: {
@@ -50,7 +50,7 @@ export default class Main extends Component {
                                     <Components />
                                 </td>
                                 <td style={{ width: '40%', position: 'fixed' }}>
-                                    <ThemeSwitcher
+                                    <ThemeSelector
                                         initialTheme={this.state.baseTheme}
                                         changeBaseTheme={this.handleBaseThemeChange}
                                         theme={muiTheme}
