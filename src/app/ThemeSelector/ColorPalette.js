@@ -28,6 +28,45 @@ const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
     return result;
 }, {});
 
+const multiplier = 1.5;
+
+const styles = {
+    container: {
+        main: {
+            position: 'absolute',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: 'rgba(128, 128, 128, 0.28)',
+            right: '50%',
+            padding: '8px 15px'
+        },
+        color: {
+            display: 'flex',
+            alignItems: 'flex-end'
+        },
+        tone: {
+            display: 'flex'
+        }
+    },
+    button: {
+        color: {
+            display: 'flex',
+            width: 15,
+            height: 15,
+            padding: 0
+        },
+        tone: {
+            display: 'flex',
+            color: '#c3c3c3',
+            width: 15,
+            height: 20,
+            padding: 0,
+            zIndex: 0,
+            flexGrow: 1
+        }
+    }
+}
+
 export default class ColorPalette extends React.Component {
 
     constructor(props) {
@@ -51,21 +90,22 @@ export default class ColorPalette extends React.Component {
     }
 
     generateColorSelector() {
+        var selectedColor = this.state.colorTone.color;
         var tone = this.state.colorTone.tone;
 
         return (
-            <div style={{ display: 'flex' }}>
+            <div style={{ ...styles.container.color, height: styles.button.color.height * multiplier }} >
                 {
                     Object.keys(colorToneList).map(color =>
                         <IconButton
                             key={color}
                             style={{
-                                display: 'flex',
+                                ...styles.button.color,
                                 backgroundColor: colorToneList[color]['500'] || '#c3c3c3',
-                                width: 20,
-                                height: 20
+                                height: (selectedColor === color ? multiplier : 1) * styles.button.color.height
                             }}
                             onClick={() => this.changeColorTone(color, tone)}
+                            hoveredStyle={{ height: styles.button.color.height * multiplier }}
                             tooltip={color}
                         />
                     )
@@ -75,25 +115,22 @@ export default class ColorPalette extends React.Component {
     }
 
     generateToneSelector() {
+        var selectedTone = this.state.colorTone.tone;
         var color = this.state.colorTone.color;
 
         return (
-            <div style={{ display: 'flex' }}>
+            <div style={{ ...styles.container.tone, height: styles.button.tone.height * multiplier }}>
                 {
                     Object.keys(colorToneList[color]).map(tone =>
                         <IconButton
                             key={tone}
                             style={{
-                                display: 'flex',
-                                flexGrow: 1,
+                                ...styles.button.tone,
                                 backgroundColor: colorToneList[color][tone],
-                                color: '#c3c3c3',
-                                width: 20,
-                                height: 50,
-                                cursor: 'pointer',
-                                zIndex: 0
+                                height: (selectedTone === tone ? multiplier : 1) * styles.button.tone.height
                             }}
                             onClick={() => this.changeColorTone(color, tone)}
+                            hoveredStyle={{ height: styles.button.tone.height * multiplier }}
                             tooltip={tone}
                         />
                     )
@@ -104,7 +141,7 @@ export default class ColorPalette extends React.Component {
 
     render() {
         return (
-            <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', backgroundColor: '#eee', right: '50%' }}>
+            <div style={styles.container.main}>
                 {this.generateColorSelector()}
                 {this.generateToneSelector()}
             </div>

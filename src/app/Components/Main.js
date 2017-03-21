@@ -49,7 +49,7 @@ export default class Main extends Component {
                                 <td style={{ width: '60%', paddingRight: 30, borderRight: '1px dashed', borderColor: muiTheme.palette.disabledColor }}>
                                     <Components />
                                 </td>
-                                <td style={{ width: '40%', position: 'fixed' }}>
+                                <td style={{ width: '40%', position: 'fixed', zIndex: 1 }}>
                                     <ThemeSelector
                                         initialTheme={this.state.baseTheme}
                                         changeBaseTheme={this.handleBaseThemeChange}
