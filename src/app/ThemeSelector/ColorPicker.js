@@ -30,7 +30,10 @@ export default class ColorPicker extends React.Component {
                     <div style={{
                         backgroundColor: this.props.color,
                         width: 20,
-                        height: 20
+                        height: 20,
+                        margin: 'auto',
+                        border: '3px solid rgba(0, 0, 0, 0.09)',
+                        borderRadius: '50%'
                     }} />
                 </div>
                 {this.state.displayColorPicker ? <ColorPalette color={this.props.color} onColorChange={this.onColorChange} /> : null}

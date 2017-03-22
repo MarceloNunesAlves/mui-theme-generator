@@ -61,7 +61,6 @@ const styles = {
             width: 15,
             height: 20,
             padding: 0,
-            zIndex: 0,
             flexGrow: 1
         }
     }
@@ -101,12 +100,12 @@ export default class ColorPalette extends React.Component {
                             key={color}
                             style={{
                                 ...styles.button.color,
-                                backgroundColor: colorToneList[color]['500'] || '#c3c3c3',
+                                backgroundColor: colorToneList[color][5] || '#c3c3c3',
                                 height: (selectedColor === color ? multiplier : 1) * styles.button.color.height
                             }}
                             onClick={() => this.changeColorTone(color, tone)}
-                            hoveredStyle={{ height: styles.button.color.height * multiplier }}
                             tooltip={color}
+                            tooltipPosition="top-center"
                         />
                     )
                 }
@@ -130,8 +129,8 @@ export default class ColorPalette extends React.Component {
                                 height: (selectedTone === tone ? multiplier : 1) * styles.button.tone.height
                             }}
                             onClick={() => this.changeColorTone(color, tone)}
-                            hoveredStyle={{ height: styles.button.tone.height * multiplier }}
                             tooltip={tone}
+                            tooltipPosition="bottom-center"
                         />
                     )
                 }
