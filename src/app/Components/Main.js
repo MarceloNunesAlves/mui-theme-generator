@@ -10,6 +10,23 @@ import ThemeSelector from '../ThemeSelector/ThemeSelector'
 
 const styles = {
     container: {
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    left: {
+        // display: 'flex',
+    },
+    right: {
+        width: 450,
+        flexShrink: 0
+    },
+    rightInner: {
+        position: 'fixed',
+        height: '100%'
+    },
+    scrollContent: {
+        overflowY: 'overlay',
+        height: '100%'
     }
 };
 
@@ -42,23 +59,23 @@ export default class Main extends Component {
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
-                <Paper style={{}} zDepth={1} >
-                    <table style={styles.container}>
-                        <tbody>
-                            <tr>
-                                <td style={{ width: '60%', paddingRight: 30, borderRight: '1px dashed', borderColor: muiTheme.palette.disabledColor }}>
-                                    <Components />
-                                </td>
-                                <td style={{ width: '40%', position: 'fixed', zIndex: 1 }}>
+                <Paper zDepth={1} >
+                    <div style={styles.container}>
+                        <div style={styles.left}>
+                            <Components />
+                        </div>
+                        <div style={styles.right}>
+                            <div style={styles.rightInner}>
+                                <div style={styles.scrollContent}>
                                     <ThemeSelector
                                         initialTheme={this.state.baseTheme}
                                         changeBaseTheme={this.handleBaseThemeChange}
                                         theme={muiTheme}
                                         onColorChange={this.handleonColorChange} />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <a style={{ position: 'fixed', top: 2, right: 5 }} href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />
                     </a>
