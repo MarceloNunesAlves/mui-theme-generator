@@ -81,6 +81,10 @@ export default class Main extends React.Component {
         let baseTheme = this.state.themeName === "dark" ? darkBaseTheme : null;
         let palette = this.state.palette;
         let muiTheme = getMuiTheme(baseTheme, { palette });
+        let components = Object.assign(...
+            Object.keys(muiTheme)
+                .filter(x => x != 'palette')
+                .map(x => ({ [x]: muiTheme[x] })));
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
@@ -97,6 +101,7 @@ export default class Main extends React.Component {
                                         changeBaseTheme={this.handleBaseThemeChange}
                                         theme={muiTheme}
                                         palette={palette}
+                                        components={components}
                                         removeFromPalette={this.removeFromPalette}
                                         openDialog={this.handleDialogOpen}
                                         onColorChange={this.handleonColorChange} />
