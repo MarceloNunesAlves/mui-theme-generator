@@ -93,7 +93,7 @@ export default class Main extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <a style={{ position: 'fixed', top: -8, right: -8 }} href="https://github.com/cimdalli/mui-theme-generator">
+                    <a style={{ position: 'fixed', top: -8, right: 8 }} href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />
                     </a>
                 </Paper>

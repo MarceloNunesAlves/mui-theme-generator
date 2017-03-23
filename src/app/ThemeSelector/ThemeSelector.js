@@ -6,7 +6,7 @@ import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 
 import ImagePalette from 'material-ui/svg-icons/image/palette';
-import FileDownload from 'material-ui/svg-icons/file/file-download';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 import ColorPicker from './ColorPicker';
 
@@ -19,7 +19,7 @@ export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, rem
                 <Tab label="dark" value="dark" />
             </Tabs>
             <FlatButton
-                icon={<FileDownload color='gray' style={{ width: 36, height: 36 }} />}
+                label="Generate"
                 style={{ height: 48 }}
             />
         </div>
@@ -39,7 +39,8 @@ export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, rem
                             primaryTogglesNestedList={true}
                             innerDivStyle={{ paddingTop: 5, paddingBottom: 5 }}
                             rightIcon={<IconButton style={{ backgroundColor: theme.palette[key], top: 0, marginTop: 10 }} />}
-                            leftCheckbox={<Checkbox style={{ top: 12 }} checked={!!palette[key]} onCheck={(e, checked) => !checked ? removeFromPalette(key) : null} />}
+                            leftIcon={!!palette[key] ? <IconButton style={{ padding: 0 }} onTouchTap={e => removeFromPalette(key)}><DeleteIcon /></IconButton> : null}
+                            insetChildren={!palette[key]}
                             nestedItems={[<ColorPicker key={key} color={theme.palette[key]} onColorChange={(color) => onColorChange(key, color)} />]}
                         />
                     )
