@@ -1,6 +1,5 @@
 import React from 'react'
 import IconButton from 'material-ui/IconButton';
-import Popover from 'material-ui/Popover';
 import * as ColorTones from 'material-ui/styles/colors'
 
 
@@ -9,10 +8,13 @@ const multiplier = 1.5;
 const styles = {
     container: {
         main: {
+            position: 'relative',
+            zIndex: 2,
             display: 'flex',
             flexDirection: 'column',
-            // backgroundColor: 'rgba(128, 128, 128, 0.28)',
-            // padding: '8px 15px'
+            padding: '5px 14px',
+            marginLeft: 32,
+            backgroundColor: 'rgba(125, 125, 125, 0.12)'
         },
         color: {
             display: 'flex',
@@ -23,21 +25,15 @@ const styles = {
         }
     },
     button: {
-        picker: {
-            border: '3px solid rgba(0, 0, 0, 0.09)',
-            borderRadius: '50%',
-            width: 20,
-            height: 20,
-            padding: 0
-        },
         color: {
-            display: 'flex',
+            // display: 'flex',
             width: 15,
             height: 15,
-            padding: 0
+            padding: 0,
+            flexGrow: 1
         },
         tone: {
-            display: 'flex',
+            // display: 'flex',
             color: '#c3c3c3',
             width: 15,
             height: 20,
@@ -85,9 +81,8 @@ export default class ColorPalette extends React.Component {
         var colorTone = parseColorTone(key);
         this.state = {
             initColor: props.color,
-            color: colorTone && colorTone.color || "indigo",
-            tone: colorTone && colorTone.tone,
-            open: false
+            color: colorTone && colorTone.color,
+            tone: colorTone && colorTone.tone
         }
     }
 
@@ -147,44 +142,11 @@ export default class ColorPalette extends React.Component {
         );
     }
 
-    handleTouchTap = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            open: true,
-            anchorEl: event.currentTarget
-        });
-    };
-
-    handleRequestClose = () => {
-        this.setState({
-            open: false
-        });
-    };
-
     render() {
-        var lastColor = colorToneList[this.state.color][this.state.tone];
-
         return (
-            <div>
-                <IconButton
-                    onTouchTap={this.handleTouchTap}
-                    style={{
-                        ...styles.button.picker,
-                        backgroundColor: lastColor || this.props.initColor
-                    }} />
-                <Popover
-                    open={this.state.open}
-                    anchorEl={this.state.anchorEl}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                    targetOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    onRequestClose={this.handleRequestClose}
-                >
-                    <div style={styles.container.main}>
-                        {this.generateColorSelector()}
-                        {this.generateToneSelector()}
-                    </div>
-                </Popover>
+            <div style={styles.container.main}>
+                {this.generateColorSelector()}
+                {this.state.color ? this.generateToneSelector() : null}
             </div>
         );
     }

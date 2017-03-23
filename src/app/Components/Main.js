@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -22,7 +22,8 @@ const styles = {
     },
     rightInner: {
         position: 'fixed',
-        height: '100%'
+        height: '100%',
+        width: 'inherit'
     },
     scrollContent: {
         overflowY: 'overlay',
@@ -30,18 +31,19 @@ const styles = {
     }
 };
 
-export default class Main extends Component {
+export default class Main extends React.Component {
     constructor(props, context) {
         super(props, context);
 
         this.state = {
-            baseTheme: "dark"
+            themeName: "dark",
+            palette: {}
         };
     }
 
-    handleBaseThemeChange = (baseTheme) => {
+    handleBaseThemeChange = (themeName) => {
         this.setState({
-            baseTheme
+            themeName
         });
     };
 
@@ -52,8 +54,21 @@ export default class Main extends Component {
         });
     }
 
+    removeFromPalette = (omitted) => {
+        var palette = Object.keys(this.state.palette)
+            .filter(key => key != omitted)
+            .reduce((result, key) => {
+                result[key] = this.state.palette[key];
+                return result;
+            }, {});
+
+        this.setState({
+            palette
+        });
+    }
+
     render() {
-        let baseTheme = this.state.baseTheme === "dark" ? darkBaseTheme : null;
+        let baseTheme = this.state.themeName === "dark" ? darkBaseTheme : null;
         let palette = this.state.palette;
         let muiTheme = getMuiTheme(baseTheme, { palette });
 
@@ -68,15 +83,17 @@ export default class Main extends Component {
                             <div style={styles.rightInner}>
                                 <div style={styles.scrollContent}>
                                     <ThemeSelector
-                                        initialTheme={this.state.baseTheme}
+                                        themeName={this.state.themeName}
                                         changeBaseTheme={this.handleBaseThemeChange}
                                         theme={muiTheme}
+                                        palette={palette}
+                                        removeFromPalette={this.removeFromPalette}
                                         onColorChange={this.handleonColorChange} />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <a style={{ position: 'fixed', top: 2, right: 5 }} href="https://github.com/cimdalli/mui-theme-generator">
+                    <a style={{ position: 'fixed', top: -8, right: -8 }} href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />
                     </a>
                 </Paper>
