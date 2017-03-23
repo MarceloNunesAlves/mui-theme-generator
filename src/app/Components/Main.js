@@ -5,8 +5,9 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
-import Components from './Components'
-import ThemeSelector from '../ThemeSelector/ThemeSelector'
+import Components from './Components';
+import ThemeSelector from '../ThemeSelector/ThemeSelector';
+import ThemeGeneratorDialog from '../ThemeSelector/ThemeGeneratorDialog';
 
 const styles = {
     container: {
@@ -37,7 +38,8 @@ export default class Main extends React.Component {
 
         this.state = {
             themeName: "dark",
-            palette: {}
+            palette: {},
+            dialogOpen: false
         };
     }
 
@@ -52,6 +54,14 @@ export default class Main extends React.Component {
         this.setState({
             palette
         });
+    }
+
+    handleDialogOpen = () => {
+        this.setState({ dialogOpen: true });
+    }
+
+    handleDialogClose = () => {
+        this.setState({ dialogOpen: false });
     }
 
     removeFromPalette = (omitted) => {
@@ -88,10 +98,18 @@ export default class Main extends React.Component {
                                         theme={muiTheme}
                                         palette={palette}
                                         removeFromPalette={this.removeFromPalette}
+                                        openDialog={this.handleDialogOpen}
                                         onColorChange={this.handleonColorChange} />
                                 </div>
                             </div>
                         </div>
+                        <ThemeGeneratorDialog
+                            open={this.state.dialogOpen}
+                            handleOpen={this.handleDialogOpen}
+                            handleClose={this.handleDialogClose}
+                            palette={this.state.palette}
+                            themeName={this.state.themeName}
+                        />
                     </div>
                     <a style={{ position: 'fixed', top: -8, right: 8 }} href="https://github.com/cimdalli/mui-theme-generator">
                         <IconButton iconClassName="muidocs-icon-custom-github" />

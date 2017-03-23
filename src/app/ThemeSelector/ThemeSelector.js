@@ -11,7 +11,7 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import ColorPicker from './ColorPicker';
 
 
-export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, removeFromPalette }) => (
+export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, openDialog, removeFromPalette }) => (
     <div style={{ margin: '30px' }}>
         <div style={{ display: 'flex' }}>
             <Tabs value={themeName} onChange={changeBaseTheme} style={{ flexGrow: 1 }} >
@@ -21,6 +21,7 @@ export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, rem
             <FlatButton
                 label="Generate"
                 style={{ height: 48 }}
+                onTouchTap={openDialog}
             />
         </div>
 
@@ -39,7 +40,7 @@ export default ({ themeName, changeBaseTheme, theme, palette, onColorChange, rem
                             primaryTogglesNestedList={true}
                             innerDivStyle={{ paddingTop: 5, paddingBottom: 5 }}
                             rightIcon={<IconButton style={{ backgroundColor: theme.palette[key], top: 0, marginTop: 10 }} />}
-                            leftIcon={!!palette[key] ? <IconButton style={{ padding: 0 }} onTouchTap={e => removeFromPalette(key)}><DeleteIcon /></IconButton> : null}
+                            leftIcon={!!palette[key] ? <IconButton style={{ marginTop: 0, padding: 0 }} onTouchTap={e => removeFromPalette(key)}><DeleteIcon /></IconButton> : null}
                             insetChildren={!palette[key]}
                             nestedItems={[<ColorPicker key={key} color={theme.palette[key]} onColorChange={(color) => onColorChange(key, color)} />]}
                         />

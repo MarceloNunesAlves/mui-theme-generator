@@ -43,7 +43,7 @@ const styles = {
     }
 };
 
-const parseColorTone = (key) => {
+export const parseColorTone = (key) => {
     if (!ColorTones[key])
         return null;
 
@@ -59,7 +59,7 @@ const parseColorTone = (key) => {
     return { color, tone, key, value: ColorTones[key] };
 }
 
-const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
+export const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
     var parseResult = parseColorTone(colorTone);
     var color = parseResult.color;
     var tone = parseResult.tone;
