@@ -16,7 +16,6 @@ export default ({ themeName, changeBaseTheme, openDialog, children }) => (
                 onTouchTap={openDialog}
             />
         </div>
-
         {children}
     </div>
 );
