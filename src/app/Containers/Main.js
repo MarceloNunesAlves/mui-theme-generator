@@ -94,7 +94,7 @@ export default class Main extends React.Component {
         this.setState({ dialogOpen: false });
     }
 
-    removeFromPalette = (omitted) => {
+    removeFromOverwrites = (omitted) => {
         var overwrites = deleteNested(this.state.overwrites, omitted);
         this.setState({
             overwrites
@@ -105,10 +105,9 @@ export default class Main extends React.Component {
         let baseTheme = this.state.themeName === "dark" ? darkBaseTheme : null;
         let palette = this.state.overwrites && this.state.overwrites.palette || {};
         let muiTheme = getMuiTheme(baseTheme, { palette });
-        let components = Object.assign(...
-            Object.keys(muiTheme)
-                .filter(x => x != 'palette')
-                .map(x => ({ [x]: muiTheme[x] })));
+        let components = Object.keys(muiTheme)
+            .filter(x => x !== 'palette')
+            .map(x => ({ [x]: muiTheme[x] }));
 
 
         let paletteItems = Object.keys(muiTheme.palette).map((key) => (
@@ -119,7 +118,7 @@ export default class Main extends React.Component {
                 primaryTogglesNestedList={true}
                 innerDivStyle={styles.container.listItem.innerDiv}
                 rightIcon={<IconButton style={{ backgroundColor: muiTheme.palette[key], ...styles.container.listItem.rightIcon }} />}
-                leftIcon={!!palette[key] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromPalette(["palette", key])}><DeleteIcon /></IconButton> : null}
+                leftIcon={!!palette[key] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromOverwrites(["palette", key])}><DeleteIcon /></IconButton> : null}
                 insetChildren={!palette[key]}
                 nestedItems={[<ColorPicker key={key} color={muiTheme.palette[key]} onColorChange={(color) => this.handleOnColorChange(["palette", key], color)} />]}
             />
@@ -129,6 +128,7 @@ export default class Main extends React.Component {
 
             var componentColors = Object.keys(components[componentKey]).map((colorKey) => {
                 var color = muiTheme[componentKey][colorKey];
+                var overwriteSelector = ["components", componentKey, colorKey];
 
                 return (
                     <ListItem
@@ -138,9 +138,9 @@ export default class Main extends React.Component {
                         primaryTogglesNestedList={true}
                         innerDivStyle={styles.container.listItem.innerDiv}
                         rightIcon={<IconButton style={{ backgroundColor: color, ...styles.container.listItem.rightIcon }} />}
-                        leftIcon={!!palette[colorKey] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromPalette(key)}><DeleteIcon /></IconButton> : null}
+                        leftIcon={!!palette[colorKey] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromOverwrites(overwriteSelector)}><DeleteIcon /></IconButton> : null}
                         insetChildren={!palette[colorKey]}
-                        nestedItems={[<ColorPicker key={colorKey} color={color} onColorChange={(color) => this.handleOnColorChange(colorKey, color)} />]}
+                        nestedItems={[<ColorPicker key={colorKey} color={color} onColorChange={(color) => this.handleOnColorChange(overwriteSelector, color)} />]}
                     />
                 );
             });
@@ -150,7 +150,6 @@ export default class Main extends React.Component {
                     key={componentKey}
                     primaryText={componentKey}
                     primaryTogglesNestedList={true}
-                    innerDivStyle={styles.container.listItem.innerDiv}
                     insetChildren={true}
                     nestedItems={componentColors}
                 />
@@ -166,6 +165,12 @@ export default class Main extends React.Component {
                         initiallyOpen={true}
                         primaryTogglesNestedList={true}
                         nestedItems={paletteItems}
+                    />
+                    <ListItem
+                        primaryText="Components"
+                        leftIcon={<ImagePalette />}
+                        primaryTogglesNestedList={true}
+                        nestedItems={componentsItems}
                     />
                 </List>
             </ThemeSelector>
