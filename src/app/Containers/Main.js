@@ -11,9 +11,9 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 import { Layout } from './Layout';
 import Components from '../Components/Components';
-import { ThemeSelector } from '../ThemeSelector/ThemeSelector';
-import { ThemeGeneratorDialog } from '../ThemeSelector/ThemeGeneratorDialog';
-import ColorPicker from '../ThemeSelector/ColorPicker';
+import { ThemeSelector } from '../Components/ThemeSelector/ThemeSelector';
+import { ThemeGeneratorDialog } from '../Components/ThemeSelector/ThemeGeneratorDialog';
+import ColorPicker from '../Components/ThemeSelector/ColorPicker';
 
 
 const styles = {
