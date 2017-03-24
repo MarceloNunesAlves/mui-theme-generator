@@ -14,7 +14,7 @@ const generateJson = (data) => {
     return JSON.stringify(data, null, 4);
 }
 
-export default ({ open, handleOpen, handleClose, palette, themeName }) => {
+export const ThemeGeneratorDialog = ({ open, handleOpen, handleClose, palette, themeName }) => {
 
     const actions = [
         <FlatButton
@@ -57,3 +57,5 @@ export default ({ open, handleOpen, handleClose, palette, themeName }) => {
         </div>
     );
 }
+
+ThemeGeneratorDialog.prototype.isPureReactComponent = true;

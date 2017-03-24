@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AppBar from 'material-ui/AppBar';
 import AutoComplete from 'material-ui/AutoComplete';
 import Badge from 'material-ui/Badge';
@@ -68,7 +68,7 @@ const style = {
     }
 }
 
-export default class Components extends Component {
+export default class Components extends React.Component {
     constructor(props, context) {
         super(props, context);
 

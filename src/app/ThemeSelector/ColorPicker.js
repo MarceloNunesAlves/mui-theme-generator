@@ -1,4 +1,5 @@
 import React from 'react'
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Slider from 'material-ui/Slider';
 import IconButton from 'material-ui/IconButton';
 import * as ColorTones from 'material-ui/styles/colors'
@@ -103,10 +104,11 @@ export const rgbToHex = (r, g, b) => {
 };
 
 
-export default class ColorPalette extends React.Component {
+export default class ColorPicker extends React.Component {
 
     constructor(props) {
         super(props);
+        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
         var key = Object.keys(ColorTones).filter(ct => ColorTones[ct] == props.color);
         var colorTone = parseColorTone(key);
@@ -118,16 +120,22 @@ export default class ColorPalette extends React.Component {
         }
     }
 
-    changeColorTone(color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) {
+    changeColorTone(color = this.state.color, tone = this.state.tone) {
         if (!!color) {
-            this.setState({
-                color, tone, alpha
-            });
-            var newColorTone = colorToneList[color][tone];
-            if (!!newColorTone && this.props.onColorChange) {
-                var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
-                this.props.onColorChange(newColor);
-            }
+            this.setState({ color, tone });
+            this.propagateColorChange(color, tone);
+        }
+    }
+
+    changeAlpha(alpha) {
+        this.setState({ alpha });
+    }
+
+    propagateColorChange(color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) {
+        var newColorTone = colorToneList[color][tone];
+        if (!!newColorTone && this.props.onColorChange) {
+            var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
+            this.props.onColorChange(newColor);
         }
     }
 
@@ -183,7 +191,8 @@ export default class ColorPalette extends React.Component {
             max={1}
             step={0.01}
             value={this.state.alpha}
-            onChange={(e, value) => this.changeColorTone(undefined, undefined, value)}
+            onChange={(e, value) => this.changeAlpha(value)}
+            onDragStop={e => this.propagateColorChange()}
             style={styles.container.alphaValue}
             sliderStyle={styles.container.alphaSlider}
         />

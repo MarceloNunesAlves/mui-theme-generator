@@ -3,7 +3,7 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
 
 
-export default ({ themeName, changeBaseTheme, openDialog, children }) => (
+export const ThemeSelector = ({ themeName, changeBaseTheme, openDialog, children }) => (
     <div style={{ margin: '30px' }}>
         <div style={{ display: 'flex' }}>
             <Tabs value={themeName} onChange={changeBaseTheme} style={{ flexGrow: 1 }} >

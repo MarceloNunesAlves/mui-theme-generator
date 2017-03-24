@@ -27,7 +27,7 @@ const styles = {
     }
 };
 
-export default ({ muiTheme, mainContent, sidebar, children }) => (
+export const Layout = ({ muiTheme, mainContent, sidebar, children }) => (
     <MuiThemeProvider muiTheme={muiTheme}>
         <Paper zDepth={1} >
             <div style={styles.container}>

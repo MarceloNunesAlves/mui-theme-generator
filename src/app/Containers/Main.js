@@ -9,10 +9,10 @@ import { List, ListItem } from 'material-ui/List';
 import ImagePalette from 'material-ui/svg-icons/image/palette';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import Layout from './Layout';
+import { Layout } from './Layout';
 import Components from '../Components/Components';
-import ThemeSelector from '../ThemeSelector/ThemeSelector';
-import ThemeGeneratorDialog from '../ThemeSelector/ThemeGeneratorDialog';
+import { ThemeSelector } from '../ThemeSelector/ThemeSelector';
+import { ThemeGeneratorDialog } from '../ThemeSelector/ThemeGeneratorDialog';
 import ColorPicker from '../ThemeSelector/ColorPicker';
 
 
@@ -35,15 +35,33 @@ const styles = {
     }
 }
 
-const createNested = (keys, val) => {
+const createNested = (keys, val, base) => {
     const lastKey = keys.pop();
-    const obj = {};
-    const lastObj = keys.reduce((obj, key) =>
-        obj[key] = obj[key] || {},
-        obj);
+    base = Object.assign({}, base);
+    const lastObj = keys.reduce((result, key) => result[key] = result[key] || {}, base);
     lastObj[lastKey] = val;
-    return obj;
+    return base;
 };
+
+const deleteNested = (val, keys) => {
+    let copy = Object.assign({}, val);
+    const lastKey = keys && keys.shift();
+
+    if (lastKey === undefined)
+        return copy;
+
+    if (keys.length === 0) {
+        return Object.keys(copy)
+            .filter(x => x !== lastKey)
+            .reduce((result, key) => {
+                result[key] = copy[key];
+                return result;
+            }, {});
+    }
+
+    copy[lastKey] = deleteNested(copy[lastKey], keys);
+    return copy;
+}
 
 export default class Main extends React.Component {
     constructor(props, context) {
@@ -52,7 +70,6 @@ export default class Main extends React.Component {
         this.state = {
             themeName: "dark",
             overwrites: {},
-            palette: {},
             dialogOpen: false
         };
     }
@@ -64,9 +81,9 @@ export default class Main extends React.Component {
     };
 
     handleOnColorChange = (keys, newValue) => {
-        var palette = Object.assign({}, this.state.palette, createNested(keys, newValue));
+        var overwrites = createNested(keys, newValue, this.state.overwrites);
         this.setState({
-            palette
+            overwrites
         });
     }
     handleDialogOpen = () => {
@@ -78,21 +95,15 @@ export default class Main extends React.Component {
     }
 
     removeFromPalette = (omitted) => {
-        var palette = Object.keys(this.state.palette)
-            .filter(key => key != omitted)
-            .reduce((result, key) => {
-                result[key] = this.state.palette[key];
-                return result;
-            }, {});
-
+        var overwrites = deleteNested(this.state.overwrites, omitted);
         this.setState({
-            palette
+            overwrites
         });
     }
 
     render() {
         let baseTheme = this.state.themeName === "dark" ? darkBaseTheme : null;
-        let palette = this.state.palette;
+        let palette = this.state.overwrites && this.state.overwrites.palette || {};
         let muiTheme = getMuiTheme(baseTheme, { palette });
         let components = Object.assign(...
             Object.keys(muiTheme)
@@ -100,7 +111,7 @@ export default class Main extends React.Component {
                 .map(x => ({ [x]: muiTheme[x] })));
 
 
-        let paletteItems = Object.keys(muiTheme.palette).map((key, i) => (
+        let paletteItems = Object.keys(muiTheme.palette).map((key) => (
             <ListItem
                 key={key}
                 primaryText={key}
@@ -108,13 +119,13 @@ export default class Main extends React.Component {
                 primaryTogglesNestedList={true}
                 innerDivStyle={styles.container.listItem.innerDiv}
                 rightIcon={<IconButton style={{ backgroundColor: muiTheme.palette[key], ...styles.container.listItem.rightIcon }} />}
-                leftIcon={!!palette[key] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromPalette(key)}><DeleteIcon /></IconButton> : null}
+                leftIcon={!!palette[key] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromPalette(["palette", key])}><DeleteIcon /></IconButton> : null}
                 insetChildren={!palette[key]}
-                nestedItems={[<ColorPicker key={key} color={muiTheme.palette[key]} onColorChange={(color) => this.handleOnColorChange([key], color)} />]}
+                nestedItems={[<ColorPicker key={key} color={muiTheme.palette[key]} onColorChange={(color) => this.handleOnColorChange(["palette", key], color)} />]}
             />
         ));
 
-        let componentsItems = Object.keys(components).map((componentKey, i) => {
+        let componentsItems = Object.keys(components).map((componentKey) => {
 
             var componentColors = Object.keys(components[componentKey]).map((colorKey) => {
                 var color = muiTheme[componentKey][colorKey];
@@ -170,7 +181,7 @@ export default class Main extends React.Component {
                     open={this.state.dialogOpen}
                     handleOpen={this.handleDialogOpen}
                     handleClose={this.handleDialogClose}
-                    palette={this.state.palette}
+                    palette={palette}
                     themeName={this.state.themeName}
                 />
             </Layout>
