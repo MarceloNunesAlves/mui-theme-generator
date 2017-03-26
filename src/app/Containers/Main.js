@@ -4,24 +4,20 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
-import IconButton from 'material-ui/IconButton';
-import { List, ListItem } from 'material-ui/List';
-import ImagePalette from 'material-ui/svg-icons/image/palette';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-
 import { Layout } from './Layout';
 import Components from '../Components/Components';
-import { ThemeSelector } from '../Components/ThemeSelector/ThemeSelector';
 import { ThemeGeneratorDialog } from '../Components/ThemeSelector/ThemeGeneratorDialog';
 import ColorPicker from '../Components/ThemeSelector/ColorPicker';
+import { SideBar } from '../Components/Layout/sidebar'
+import { TopBar } from '../Components/Layout/topbar'
 
 
 const styles = {
     container: {
         listItem: {
             innerDiv: {
-                paddingTop: 5,
-                paddingBottom: 5
+                paddingTop: 6,
+                paddingBottom: 6
             },
             rightIcon: {
                 top: 0,
@@ -44,24 +40,32 @@ const createNested = (keys, val, base) => {
 };
 
 const deleteNested = (val, keys) => {
-    let copy = Object.assign({}, val);
-    const lastKey = keys && keys.shift();
+    let filtered = {};
+    const firstKey = keys && keys.shift();
 
-    if (lastKey === undefined)
-        return copy;
+    if (firstKey === undefined)
+        return val;
 
     if (keys.length === 0) {
-        return Object.keys(copy)
-            .filter(x => x !== lastKey)
+        return Object.keys(val)
+            .filter(x => x !== firstKey)
             .reduce((result, key) => {
-                result[key] = copy[key];
+                result[key] = val[key];
                 return result;
-            }, {});
+            }, filtered);
     }
 
-    copy[lastKey] = deleteNested(copy[lastKey], keys);
-    return copy;
+    let nested = deleteNested(val[firstKey], keys);
+    if (!!Object.keys(nested).length) {
+        filtered[firstKey] = nested;
+    }
+
+    return filtered;
 }
+
+const defaulTheme = getMuiTheme();
+const componentList = Object.keys(defaulTheme)
+    .filter(x => ['palette', 'baseTheme', 'rawTheme'].indexOf(x) === -1 && typeof defaulTheme[x] === "object");
 
 export default class Main extends React.Component {
     constructor(props, context) {
@@ -75,17 +79,9 @@ export default class Main extends React.Component {
     }
 
     handleBaseThemeChange = (themeName) => {
-        this.setState({
-            themeName
-        });
+        this.setState({ themeName });
     };
 
-    handleOnColorChange = (keys, newValue) => {
-        var overwrites = createNested(keys, newValue, this.state.overwrites);
-        this.setState({
-            overwrites
-        });
-    }
     handleDialogOpen = () => {
         this.setState({ dialogOpen: true });
     }
@@ -94,99 +90,74 @@ export default class Main extends React.Component {
         this.setState({ dialogOpen: false });
     }
 
+    addToOverwrites = (keys, newValue) => {
+        var overwrites = createNested(keys, newValue, this.state.overwrites);
+        this.setState({ overwrites });
+    }
+
     removeFromOverwrites = (omitted) => {
         var overwrites = deleteNested(this.state.overwrites, omitted);
-        this.setState({
-            overwrites
-        });
+        this.setState({ overwrites });
+    }
+
+    selectFile = () => {
+        this.refs.fileUploader.click();
+    }
+
+    readFile = (e) => {
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        reader.onloadend = () => {
+            var overwrites = JSON.parse(reader.result);
+            if (overwrites) {
+                this.setState({
+                    overwrites
+                });
+            }
+        }
+        reader.readAsText(file);
+        // reader.readAsDataURL(file)
     }
 
     render() {
-        let baseTheme = this.state.themeName === "dark" ? darkBaseTheme : null;
-        let palette = this.state.overwrites && this.state.overwrites.palette || {};
-        let muiTheme = getMuiTheme(baseTheme, { palette });
-        let components = Object.keys(muiTheme)
-            .filter(x => x !== 'palette')
-            .map(x => ({ [x]: muiTheme[x] }));
+        let themeBase = this.state.themeName === "dark" ? darkBaseTheme : null;
+        let overwrites = this.state.overwrites || {};
+        let muiTheme = getMuiTheme(themeBase, overwrites);
 
+        let { palette, baseTheme, rawTheme, isRtl, fontFamily, ...components } = muiTheme;
 
-        let paletteItems = Object.keys(muiTheme.palette).map((key) => (
-            <ListItem
-                key={key}
-                primaryText={key}
-                secondaryText={muiTheme.palette[key]}
-                primaryTogglesNestedList={true}
-                innerDivStyle={styles.container.listItem.innerDiv}
-                rightIcon={<IconButton style={{ backgroundColor: muiTheme.palette[key], ...styles.container.listItem.rightIcon }} />}
-                leftIcon={!!palette[key] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromOverwrites(["palette", key])}><DeleteIcon /></IconButton> : null}
-                insetChildren={!palette[key]}
-                nestedItems={[<ColorPicker key={key} color={muiTheme.palette[key]} onColorChange={(color) => this.handleOnColorChange(["palette", key], color)} />]}
-            />
-        ));
+        let topBar = <TopBar
+            changeBaseTheme={this.handleBaseThemeChange}
+            themeName={this.state.themeName}
+            openDialog={this.handleDialogOpen}
+            selectFile={this.selectFile}
+        />
 
-        let componentsItems = Object.keys(components).map((componentKey) => {
-
-            var componentColors = Object.keys(components[componentKey]).map((colorKey) => {
-                var color = muiTheme[componentKey][colorKey];
-                var overwriteSelector = ["components", componentKey, colorKey];
-
-                return (
-                    <ListItem
-                        key={colorKey}
-                        primaryText={colorKey}
-                        secondaryText={color}
-                        primaryTogglesNestedList={true}
-                        innerDivStyle={styles.container.listItem.innerDiv}
-                        rightIcon={<IconButton style={{ backgroundColor: color, ...styles.container.listItem.rightIcon }} />}
-                        leftIcon={!!palette[colorKey] ? <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => this.removeFromOverwrites(overwriteSelector)}><DeleteIcon /></IconButton> : null}
-                        insetChildren={!palette[colorKey]}
-                        nestedItems={[<ColorPicker key={colorKey} color={color} onColorChange={(color) => this.handleOnColorChange(overwriteSelector, color)} />]}
-                    />
-                );
-            });
-
-            return (
-                <ListItem
-                    key={componentKey}
-                    primaryText={componentKey}
-                    primaryTogglesNestedList={true}
-                    insetChildren={true}
-                    nestedItems={componentColors}
-                />
-            );
-        });
-
-        let sidebar =
-            <ThemeSelector changeBaseTheme={this.handleBaseThemeChange} openDialog={this.handleDialogOpen} themeName={this.state.themeName}>
-                <List>
-                    <ListItem
-                        primaryText="Palette"
-                        leftIcon={<ImagePalette />}
-                        initiallyOpen={true}
-                        primaryTogglesNestedList={true}
-                        nestedItems={paletteItems}
-                    />
-                    <ListItem
-                        primaryText="Components"
-                        leftIcon={<ImagePalette />}
-                        primaryTogglesNestedList={true}
-                        nestedItems={componentsItems}
-                    />
-                </List>
-            </ThemeSelector>
-
+        let sideBar = <SideBar
+            palette={palette}
+            components={components}
+            overwrites={overwrites}
+            addToOverwrites={this.addToOverwrites}
+            removeFromOverwrites={this.removeFromOverwrites}
+        />
 
         return (
             <Layout
                 muiTheme={muiTheme}
+                topBar={topBar}
+                sideBar={sideBar}
                 mainContent={<Components />}
-                sidebar={sidebar}
             >
+                <input type="file" id="file" ref="fileUploader"
+                    style={{ display: "none" }}
+                    onChange={(event) => { this.readFile(event) }}
+                    onClick={(event) => { event.target.value = null }} />
                 <ThemeGeneratorDialog
                     open={this.state.dialogOpen}
                     handleOpen={this.handleDialogOpen}
                     handleClose={this.handleDialogClose}
-                    palette={palette}
+                    overwrites={overwrites}
                     themeName={this.state.themeName}
                 />
             </Layout>

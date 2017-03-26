@@ -39,8 +39,9 @@ const config = {
     loaders: [
       {
         test: /\.js$/, // All .js files
-        loaders: ['babel-loader'],
+        loaders: ['react-hot', 'babel-loader'],
         exclude: [nodeModulesPath],
+        include: path.join(__dirname, 'src')
       },
     ],
   },
