@@ -1,6 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import FileSaver from 'file-saver'
+import copy from 'copy-to-clipboard';
 
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -19,11 +20,13 @@ export class ThemeGeneratorDialog extends React.Component {
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
         this.state = {
-            includeImport: false
+            includeImport: false,
+            mapColors: true
         }
 
         this.generateContent = this.generateContent.bind(this);
         this.downloadFile = this.downloadFile.bind(this);
+        this.copyToClipboard = this.copyToClipboard.bind(this);
     }
 
     actions = (handleClose) => [
@@ -31,6 +34,11 @@ export class ThemeGeneratorDialog extends React.Component {
             label="Cancel"
             primary={true}
             onTouchTap={handleClose}
+        />,
+        <FlatButton
+            label="Copy"
+            primary={true}
+            onTouchTap={this.copyToClipboard}
         />,
         <FlatButton
             label="Download"
@@ -63,9 +71,14 @@ export class ThemeGeneratorDialog extends React.Component {
         this.props.handleClose();
     }
 
+    copyToClipboard() {
+        copy(this.generateContent());
+        this.props.handleClose();
+    }
+
     render() {
         let { handleClose, open } = this.props;
-        let { includeImport } = this.state;
+        let { includeImport, mapColors } = this.state;
 
         return (
             <div>
@@ -82,10 +95,18 @@ export class ThemeGeneratorDialog extends React.Component {
                             this.generateContent()
                         }
                     </pre>
-                    <div style={{ position: 'absolute', bottom: 14 }}>
+                    <div style={{ position: 'absolute', bottom: 14, display: 'flex' }}>
+                        <Toggle
+                            label="Map colors"
+                            labelPosition="right"
+                            style={{ width: 'auto', marginRight: 20 }}
+                            toggled={mapColors}
+                            onToggle={(evt, mapColors) => this.setState({ mapColors })}
+                        />
                         <Toggle
                             label="Include import section"
                             labelPosition="right"
+                            style={{ width: 'auto', marginRight: 20 }}
                             toggled={includeImport}
                             onToggle={(evt, includeImport) => this.setState({ includeImport })}
                         />

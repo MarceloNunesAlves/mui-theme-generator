@@ -74,7 +74,8 @@ export default class Main extends React.Component {
         this.state = {
             themeName: "dark",
             overwrites: {},
-            dialogOpen: false
+            generatorDialogOpen: false,
+            loadDialogOpen: false
         };
     }
 
@@ -82,12 +83,12 @@ export default class Main extends React.Component {
         this.setState({ themeName });
     };
 
-    handleDialogOpen = () => {
-        this.setState({ dialogOpen: true });
+    handleGeneratorDialogOpen = () => {
+        this.setState({ generatorDialogOpen: true });
     }
 
-    handleDialogClose = () => {
-        this.setState({ dialogOpen: false });
+    handleGeneratorDialogClose = () => {
+        this.setState({ generatorDialogOpen: false });
     }
 
     addToOverwrites = (keys, newValue) => {
@@ -102,6 +103,14 @@ export default class Main extends React.Component {
 
     selectFile = () => {
         this.refs.fileUploader.click();
+    }
+
+    handleLoadDialogOpen = () => {
+        this.setState({ loadDialogOpen: true });
+    }
+
+    handleLoadDialogClose = () => {
+        this.setState({ loadDialogOpen: false });
     }
 
     readFile = (e) => {
@@ -129,8 +138,9 @@ export default class Main extends React.Component {
         let topBar = <TopBar
             changeBaseTheme={this.handleBaseThemeChange}
             themeName={this.state.themeName}
-            openDialog={this.handleDialogOpen}
+            openGeneratorDialog={this.handleGeneratorDialogOpen}
             selectFile={this.selectFile}
+            openLoadDialog={this.handleLoadDialogOpen}
         />
 
         let sideBar = <SideBar
@@ -153,9 +163,9 @@ export default class Main extends React.Component {
                     onChange={(event) => { this.readFile(event) }}
                     onClick={(event) => { event.target.value = null }} />
                 <ThemeGeneratorDialog
-                    open={this.state.dialogOpen}
-                    handleOpen={this.handleDialogOpen}
-                    handleClose={this.handleDialogClose}
+                    open={this.state.generatorDialogOpen}
+                    handleOpen={this.handleGeneratorDialogOpen}
+                    handleClose={this.handleGeneratorDialogClose}
                     overwrites={overwrites}
                     themeName={this.state.themeName}
                 />
