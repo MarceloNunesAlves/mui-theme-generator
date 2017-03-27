@@ -46,18 +46,18 @@ const deleteNested = (val, keys) => {
     if (firstKey === undefined)
         return val;
 
-    if (keys.length === 0) {
-        return Object.keys(val)
-            .filter(x => x !== firstKey)
-            .reduce((result, key) => {
-                result[key] = val[key];
-                return result;
-            }, filtered);
-    }
+    Object.keys(val)
+        .filter(x => x !== firstKey)
+        .reduce((result, key) => {
+            result[key] = val[key];
+            return result;
+        }, filtered);
 
-    let nested = deleteNested(val[firstKey], keys);
-    if (!!Object.keys(nested).length) {
-        filtered[firstKey] = nested;
+    if (keys.length !== 0) {
+        let nested = deleteNested(val[firstKey], keys);
+        if (!!Object.keys(nested).length) {
+            filtered[firstKey] = nested;
+        }
     }
 
     return filtered;

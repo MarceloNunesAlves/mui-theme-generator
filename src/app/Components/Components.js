@@ -135,12 +135,6 @@ export default class Components extends React.Component {
 
         return (
             <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "separate", borderSpacing: "0 2em" }}>
-                {/*<thead style={{ textAlign: "left" }}>
-                    <tr>
-                        <th>Component</th>
-                        <th>Example</th>
-                    </tr>
-                </thead>*/}
                 <tbody>
                     <ComponentWrapper title="AppBar / Drawer">
                         <AppBar
