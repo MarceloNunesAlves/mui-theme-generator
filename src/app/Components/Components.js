@@ -151,7 +151,9 @@ export default class Components extends React.Component {
                             docked={false}
                             width={300}
                             open={this.state.drawerOpen}
-                            onRequestChange={(drawerOpen) => this.setState({ drawerOpen })} >
+                            onRequestChange={(drawerOpen) => this.setState({ drawerOpen })}
+                        >
+                            <AppBar title="AppBar" />
                             <MenuItem onTouchTap={this.handleCloseDrawer}>Menu Item</MenuItem>
                             <MenuItem onTouchTap={this.handleCloseDrawer}>Menu Item 2</MenuItem>
                         </Drawer>

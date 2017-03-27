@@ -117,7 +117,6 @@ export default class Main extends React.Component {
             }
         }
         reader.readAsText(file);
-        // reader.readAsDataURL(file)
     }
 
     render() {
