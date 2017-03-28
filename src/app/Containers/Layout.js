@@ -6,7 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 const styles = {
     toolbar: {
         position: 'fixed',
-        zIndex: 9999,
+        zIndex: 2000,
         height: 65,
         width: '100%'
     },

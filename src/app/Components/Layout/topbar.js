@@ -6,6 +6,9 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 
+import TextIcon from 'material-ui/svg-icons/action/subject';
+import FileIcon from 'material-ui/svg-icons/editor/insert-drive-file';
+
 export class TopBar extends React.Component {
 
     constructor(props) {
@@ -61,13 +64,13 @@ export class TopBar extends React.Component {
                     <Popover
                         open={this.state.open}
                         anchorEl={this.state.anchorEl}
-                        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                        targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'middle', vertical: 'center' }}
+                        targetOrigin={{ horizontal: 'middle', vertical: 'top' }}
                         onRequestClose={this.handleRequestClose}
                     >
                         <Menu>
-                            <MenuItem primaryText="Text" onTouchTap={this.handleSelectAction(openLoadDialog)} />
-                            <MenuItem primaryText="File" onTouchTap={this.handleSelectAction(selectFile)} />
+                            <MenuItem primaryText="Text" onTouchTap={this.handleSelectAction(openLoadDialog)} leftIcon={<TextIcon />} />
+                            <MenuItem primaryText="File" onTouchTap={this.handleSelectAction(selectFile)} leftIcon={<FileIcon />} />
                         </Menu>
                     </Popover>
                     <FlatButton label="Load" primary={true} style={{ height: '100%' }} onTouchTap={this.handleTouchTap} />

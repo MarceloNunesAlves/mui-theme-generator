@@ -8,7 +8,20 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import Toggle from 'material-ui/Toggle';
+import Snackbar from 'material-ui/Snackbar';
 
+import { reverseColorMap } from '../ThemeSelector/ColorPicker'
+
+
+const mapColorsToColorTone = (data) => {
+    if (typeof data === "string")
+        return reverseColorMap[data] && "Colors." + reverseColorMap[data] || data;
+
+    return Object.keys(data).reduce((result, key) => {
+        result[key] = mapColorsToColorTone(data[key]);
+        return result;
+    }, {});
+}
 
 const generateJson = (data) => {
     return JSON.stringify(data, null, 4);
@@ -21,12 +34,9 @@ export class ThemeGeneratorDialog extends React.Component {
 
         this.state = {
             includeImport: false,
-            mapColors: true
+            mapColors: false,
+            snackOpen: false
         }
-
-        this.generateContent = this.generateContent.bind(this);
-        this.downloadFile = this.downloadFile.bind(this);
-        this.copyToClipboard = this.copyToClipboard.bind(this);
     }
 
     actions = (handleClose) => [
@@ -50,7 +60,10 @@ export class ThemeGeneratorDialog extends React.Component {
 
     generateContent() {
         let { themeName, overwrites } = this.props;
-        let { includeImport } = this.state;
+        let { includeImport, mapColors } = this.state;
+
+        overwrites = mapColors ? mapColorsToColorTone(overwrites) : overwrites;
+        let json = generateJson(overwrites).replace(/\"(Colors\..+)\"/g, "$1");;
 
         return includeImport ?
             "import getMuiTheme from 'material-ui/styles/getMuiTheme';" + "\n" +
@@ -58,23 +71,26 @@ export class ThemeGeneratorDialog extends React.Component {
             "import * as Colors from 'material-ui/styles/colors';" + "\n\n" +
 
             "const getTheme = () => {" + "\n" +
-            "  " + `let overwrites = ${generateJson(overwrites)};` + "\n" +
+            "  " + `let overwrites = ${json};` + "\n" +
             "  " + "return getMuiTheme(baseTheme, overwrites);" + "\n" +
             "}"
-            :
-            generateJson(overwrites)
+            : json
     }
 
-    downloadFile() {
+    downloadFile = () => {
         var blob = new Blob([this.generateContent()], { type: "text/plain;charset=utf-8" });
         FileSaver.saveAs(blob, "theme.js");
         this.props.handleClose();
     }
 
-    copyToClipboard() {
+    copyToClipboard = () => {
         copy(this.generateContent());
-        this.props.handleClose();
+        this.setState({ snackOpen: true });
     }
+
+    handleRequestClose = () => {
+        this.setState({ snackOpen: false });
+    };
 
     render() {
         let { handleClose, open } = this.props;
@@ -112,6 +128,13 @@ export class ThemeGeneratorDialog extends React.Component {
                         />
                     </div>
                 </Dialog>
+
+                <Snackbar
+                    open={this.state.snackOpen}
+                    message="Copied"
+                    autoHideDuration={4000}
+                    onRequestClose={this.handleRequestClose}
+                />
             </div>
         );
     }

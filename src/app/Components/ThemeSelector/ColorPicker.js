@@ -61,8 +61,8 @@ const styles = {
     }
 };
 
-export const parseColorTone = (key) => {
-    if (!ColorTones[key])
+const parseColorTone = (key) => {
+    if (!key || !ColorTones[key])
         return null;
 
     var test = /([^A\d]+)([A?\d]+)?/.exec(key);
@@ -77,7 +77,7 @@ export const parseColorTone = (key) => {
     return { color, tone, key, value: ColorTones[key] };
 }
 
-export const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
+const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
     var parseResult = parseColorTone(colorTone);
     var color = parseResult.color;
     var tone = parseResult.tone;
@@ -89,19 +89,59 @@ export const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) 
     return result;
 }, {});
 
-export const rgbToHex = (r, g, b) => {
-    var matches = r.match(/\d+/g);
-    if (matches.length > 2) {
-        r = matches[0];
-        g = matches[1];
-        b = matches[2];
+
+export const reverseColorMap = Object.keys(ColorTones).reduce((result, key) => {
+    let value = ColorTones[key];
+    result[value] = key;
+    return result;
+}, {});
+
+
+const rgbaToHex = (value) => {
+    if (/#/.test(value))
+        return value;
+
+    let matches = value.match(/[\d\.]+/g);
+
+    if (matches.length < 3)
+        return {};
+
+    let r = matches[0];
+    let g = matches[1];
+    let b = matches[2];
+    let a = matches[3];
+
+    return {
+        color: '#' + [r, g, b].map(x => {
+            const hex = Number(x).toString(16)
+            return hex.length === 1 ? '0' + hex : hex
+        }).join(''),
+        alpha: a
+    };
+};
+
+const parseColor = (value) => {
+    let colorTone = null;
+    let alpha = 1;
+
+    if (value) {
+        let reverse = reverseColorMap[value];
+        if (reverse) {
+            colorTone = parseColorTone(reverse);
+        }
+        else {
+            let rbga = rgbaToHex(value);
+            if (rbga.color) {
+                colorTone = parseColor(rbga.color).colorTone;
+                alpha = rbga.alpha || alpha;
+            }
+        }
     }
 
-    return '#' + [r, g, b].map(x => {
-        const hex = x.toString(16)
-        return hex.length === 1 ? '0' + hex : hex
-    }).join('');
-};
+    return {
+        colorTone, alpha
+    };
+}
 
 
 export default class ColorPicker extends React.Component {
@@ -110,28 +150,29 @@ export default class ColorPicker extends React.Component {
         super(props);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
-        var key = Object.keys(ColorTones).filter(ct => ColorTones[ct] == props.color);
-        var colorTone = parseColorTone(key);
+        let parsedColor = parseColor(props.color);
+        let { colorTone, alpha } = parsedColor;
+
         this.state = {
             initColor: props.color,
             color: colorTone && colorTone.color,
             tone: colorTone && colorTone.tone,
-            alpha: 1
+            alpha: alpha
         }
     }
 
-    changeColorTone(color = this.state.color, tone = this.state.tone) {
+    changeColorTone = (color = this.state.color, tone = this.state.tone) => {
         if (!!color) {
             this.setState({ color, tone });
             this.propagateColorChange(color, tone);
         }
     }
 
-    changeAlpha(alpha) {
+    changeAlpha = (alpha) => {
         this.setState({ alpha });
     }
 
-    propagateColorChange(color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) {
+    propagateColorChange = (color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) => {
         var newColorTone = colorToneList[color][tone];
         if (!!newColorTone && this.props.onColorChange) {
             var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
@@ -139,7 +180,7 @@ export default class ColorPicker extends React.Component {
         }
     }
 
-    generateColorSelector() {
+    generateColorSelector = () => {
         return (
             <div style={{ ...styles.container.color, height: styles.button.color.height * multiplier }} >
                 {
@@ -161,7 +202,7 @@ export default class ColorPicker extends React.Component {
         );
     }
 
-    generateToneSelector() {
+    generateToneSelector = () => {
         var color = this.state.color;
 
         return (
@@ -203,10 +244,12 @@ export default class ColorPicker extends React.Component {
             <div style={styles.container.main}>
                 {this.generateColorSelector()}
                 {this.state.color ? this.generateToneSelector() : null}
-                <div style={styles.container.alpha}>
-                    {this.state.color ? this.generateAlphaSelector() : null}
-                    <div style={styles.container.alphaText}>{this.state.alpha}</div>
-                </div>
+                {this.state.color ?
+                    <div style={styles.container.alpha}>
+                        {this.generateAlphaSelector()}
+                        <div style={styles.container.alphaText}>{this.state.alpha}</div>
+                    </div> : null
+                }
             </div>
         );
     }

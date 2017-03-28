@@ -7,6 +7,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import { Layout } from './Layout';
 import Components from '../Components/Components';
 import { ThemeGeneratorDialog } from '../Components/ThemeSelector/ThemeGeneratorDialog';
+import { LoadDialog } from '../Components/ThemeSelector/LoadDialog';
 import ColorPicker from '../Components/ThemeSelector/ColorPicker';
 import { SideBar } from '../Components/Layout/sidebar'
 import { TopBar } from '../Components/Layout/topbar'
@@ -113,6 +114,10 @@ export default class Main extends React.Component {
         this.setState({ loadDialogOpen: false });
     }
 
+    setOverwrites = (overwrites) => {
+        this.setState({ overwrites });
+    }
+
     readFile = (e) => {
         let reader = new FileReader();
         let file = e.target.files[0];
@@ -162,12 +167,18 @@ export default class Main extends React.Component {
                     style={{ display: "none" }}
                     onChange={(event) => { this.readFile(event) }}
                     onClick={(event) => { event.target.value = null }} />
+
                 <ThemeGeneratorDialog
                     open={this.state.generatorDialogOpen}
-                    handleOpen={this.handleGeneratorDialogOpen}
                     handleClose={this.handleGeneratorDialogClose}
                     overwrites={overwrites}
                     themeName={this.state.themeName}
+                />
+
+                <LoadDialog
+                    open={this.state.loadDialogOpen}
+                    handleClose={this.handleLoadDialogClose}
+                    setOverwrites={this.setOverwrites}
                 />
             </Layout>
         );
