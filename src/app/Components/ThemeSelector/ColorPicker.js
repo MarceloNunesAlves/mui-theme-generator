@@ -120,7 +120,7 @@ const rgbaToHex = (value) => {
     };
 };
 
-const parseColor = (value) => {
+export const parseColor = (value) => {
     let colorTone = null;
     let alpha = 1;
 

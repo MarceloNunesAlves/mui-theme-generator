@@ -10,12 +10,20 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import Toggle from 'material-ui/Toggle';
 import Snackbar from 'material-ui/Snackbar';
 
-import { reverseColorMap } from '../ThemeSelector/ColorPicker'
+import { parseColor } from '../ThemeSelector/ColorPicker'
 
 
 const mapColorsToColorTone = (data) => {
-    if (typeof data === "string")
-        return reverseColorMap[data] && "Colors." + reverseColorMap[data] || data;
+    if (typeof data === "string") {
+        let { colorTone, alpha } = parseColor(data);
+        if (colorTone.key) {
+            let color = "Colors." + colorTone.key;
+            if (alpha !== 1)
+                return `fade(${color}, ${alpha})`;
+            return color;
+        }
+        return data;
+    }
 
     return Object.keys(data).reduce((result, key) => {
         result[key] = mapColorsToColorTone(data[key]);
@@ -63,12 +71,15 @@ export class ThemeGeneratorDialog extends React.Component {
         let { includeImport, mapColors } = this.state;
 
         overwrites = mapColors ? mapColorsToColorTone(overwrites) : overwrites;
-        let json = generateJson(overwrites).replace(/\"(Colors\..+)\"/g, "$1");;
+        let json = generateJson(overwrites)
+            .replace(/\"(Colors\..+)\"/g, "$1")
+            .replace(/\"(fade.+)\"/g, "$1");
 
         return includeImport ?
             "import getMuiTheme from 'material-ui/styles/getMuiTheme';" + "\n" +
             `import baseTheme from 'material-ui/styles/baseThemes/${themeName}BaseTheme';` + "\n" +
-            "import * as Colors from 'material-ui/styles/colors';" + "\n\n" +
+            "import * as Colors from 'material-ui/styles/colors';" + "\n" +
+            "import { fade } from 'material-ui/utils/colorManipulator'" + "\n\n" +
 
             "const getTheme = () => {" + "\n" +
             "  " + `let overwrites = ${json};` + "\n" +
@@ -105,6 +116,7 @@ export class ThemeGeneratorDialog extends React.Component {
                     open={open}
                     onRequestClose={handleClose}
                     autoScrollBodyContent={true}
+                    contentStyle={{ marginTop: -120 }}
                 >
                     <pre>
                         {
