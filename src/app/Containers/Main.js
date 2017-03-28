@@ -8,7 +8,6 @@ import { Layout } from './Layout';
 import Components from '../Components/Components';
 import { ThemeGeneratorDialog } from '../Components/ThemeSelector/ThemeGeneratorDialog';
 import { LoadDialog } from '../Components/ThemeSelector/LoadDialog';
-import ColorPicker from '../Components/ThemeSelector/ColorPicker';
 import { SideBar } from '../Components/Layout/sidebar'
 import { TopBar } from '../Components/Layout/topbar'
 
@@ -69,8 +68,8 @@ const componentList = Object.keys(defaulTheme)
     .filter(x => ['palette', 'baseTheme', 'rawTheme'].indexOf(x) === -1 && typeof defaulTheme[x] === "object");
 
 export default class Main extends React.Component {
-    constructor(props, context) {
-        super(props, context);
+    constructor() {
+        super();
 
         this.state = {
             themeName: "dark",
