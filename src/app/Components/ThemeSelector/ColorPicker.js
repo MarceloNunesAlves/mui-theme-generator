@@ -2,8 +2,9 @@ import React from 'react'
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Slider from 'material-ui/Slider';
 import IconButton from 'material-ui/IconButton';
-import * as ColorTones from 'material-ui/styles/colors'
+// import * as ColorTones from 'material-ui/styles/colors'
 import { fade } from 'material-ui/utils/colorManipulator'
+import { Color, ColorHelper } from '../../utils/Color'
 
 
 const multiplier = 1.5;
@@ -44,14 +45,12 @@ const styles = {
     },
     button: {
         color: {
-            // display: 'flex',
             width: 15,
             height: 15,
             padding: 0,
             flexGrow: 1
         },
         tone: {
-            // display: 'flex',
             color: '#c3c3c3',
             width: 15,
             height: 20,
@@ -61,87 +60,87 @@ const styles = {
     }
 };
 
-const parseColorTone = (key) => {
-    if (!key || !ColorTones[key])
-        return null;
+// const parseColorTone = (key) => {
+//     if (!key || !ColorTones[key])
+//         return null;
 
-    var test = /([^A\d]+)([A?\d]+)?/.exec(key);
-    var color = test[1];
-    var tone = test[2];
+//     var test = /([^A\d]+)([A?\d]+)?/.exec(key);
+//     var color = test[1];
+//     var tone = test[2];
 
-    if (color && !tone) {
-        tone = color;
-        color = ' ';
-    }
+//     if (color && !tone) {
+//         tone = color;
+//         color = ' ';
+//     }
 
-    return { color, tone, key, value: ColorTones[key] };
-}
+//     return { color, tone, key, value: ColorTones[key] };
+// }
 
-const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
-    var parseResult = parseColorTone(colorTone);
-    var color = parseResult.color;
-    var tone = parseResult.tone;
-    var value = parseResult.value;
+// const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
+//     var parseResult = parseColorTone(colorTone);
+//     var color = parseResult.color;
+//     var tone = parseResult.tone;
+//     var value = parseResult.value;
 
-    result[color] = result[color] || {};
-    result[color][tone] = value;
+//     result[color] = result[color] || {};
+//     result[color][tone] = value;
 
-    return result;
-}, {});
-
-
-export const reverseColorMap = Object.keys(ColorTones).reduce((result, key) => {
-    let value = ColorTones[key];
-    result[value] = key;
-    return result;
-}, {});
+//     return result;
+// }, {});
 
 
-const rgbaToHex = (value) => {
-    if (/#/.test(value))
-        return value;
+// export const reverseColorMap = Object.keys(ColorTones).reduce((result, key) => {
+//     let value = ColorTones[key];
+//     result[value] = key;
+//     return result;
+// }, {});
 
-    let matches = value.match(/[\d\.]+/g);
 
-    if (matches.length < 3)
-        return {};
+// const rgbaToHex = (value) => {
+//     if (/#/.test(value))
+//         return value;
 
-    let r = matches[0];
-    let g = matches[1];
-    let b = matches[2];
-    let a = matches[3];
+//     let matches = value.match(/[\d\.]+/g);
 
-    return {
-        color: '#' + [r, g, b].map(x => {
-            const hex = Number(x).toString(16)
-            return hex.length === 1 ? '0' + hex : hex
-        }).join(''),
-        alpha: a
-    };
-};
+//     if (matches.length < 3)
+//         return {};
 
-export const parseColor = (value) => {
-    let colorTone = null;
-    let alpha = 1;
+//     let r = matches[0];
+//     let g = matches[1];
+//     let b = matches[2];
+//     let a = matches[3];
 
-    if (value) {
-        let reverse = reverseColorMap[value];
-        if (reverse) {
-            colorTone = parseColorTone(reverse);
-        }
-        else {
-            let rbga = rgbaToHex(value);
-            if (rbga.color) {
-                colorTone = parseColor(rbga.color).colorTone;
-                alpha = rbga.alpha || alpha;
-            }
-        }
-    }
+//     return {
+//         color: '#' + [r, g, b].map(x => {
+//             const hex = Number(x).toString(16)
+//             return hex.length === 1 ? '0' + hex : hex
+//         }).join(''),
+//         alpha: a
+//     };
+// };
 
-    return {
-        colorTone, alpha
-    };
-}
+// export const parseColor = (value) => {
+//     let colorTone = null;
+//     let alpha = 1;
+
+//     if (value) {
+//         let reverse = reverseColorMap[value];
+//         if (reverse) {
+//             colorTone = parseColorTone(reverse);
+//         }
+//         else {
+//             let rbga = rgbaToHex(value);
+//             if (rbga.color) {
+//                 colorTone = parseColor(rbga.color).colorTone;
+//                 alpha = rbga.alpha || alpha;
+//             }
+//         }
+//     }
+
+//     return {
+//         colorTone, alpha
+//     };
+// }
 
 
 export default class ColorPicker extends React.Component {
@@ -150,14 +149,17 @@ export default class ColorPicker extends React.Component {
         super(props);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
-        let parsedColor = parseColor(props.color);
-        let { colorTone, alpha } = parsedColor;
+        // let parsedColor = parseColor(props.color);
+        // let { colorTone, alpha } = parsedColor;
+
+        let color = new Color(props.color);
+        let colorTone = color.colorTone;
 
         this.state = {
             initColor: props.color,
             color: colorTone && colorTone.color,
             tone: colorTone && colorTone.tone,
-            alpha: alpha
+            alpha: this._color.a
         }
     }
 
@@ -173,23 +175,27 @@ export default class ColorPicker extends React.Component {
     }
 
     propagateColorChange = (color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) => {
-        var newColorTone = colorToneList[color][tone];
-        if (!!newColorTone && this.props.onColorChange) {
-            var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
-            this.props.onColorChange(newColor);
-        }
+        // var newColorTone = colorToneList[color][tone];
+        // if (!!newColorTone && this.props.onColorChange) {
+        //     var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
+        //     this.props.onColorChange(newColor);
+        // }
+
+        this._color.parse(color + tone);
+        this._color.a = alpha;
+        this.props.onColorChange(this._color);
     }
 
     generateColorSelector = () => {
         return (
             <div style={{ ...styles.container.color, height: styles.button.color.height * multiplier }} >
                 {
-                    Object.keys(colorToneList).map(color =>
+                    Object.keys(ColorHelper.colorToneList).map(color =>
                         <IconButton
                             key={color}
                             style={{
                                 ...styles.button.color,
-                                backgroundColor: colorToneList[color][Object.keys(colorToneList[color])[5]],
+                                backgroundColor: colorToneList[color][Object.keys(ColorHelper.colorToneList[color])[5]],
                                 height: (color === this.state.color ? multiplier : 1) * styles.button.color.height
                             }}
                             onClick={() => this.changeColorTone(color)}
