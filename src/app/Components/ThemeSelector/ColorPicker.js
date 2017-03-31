@@ -2,9 +2,8 @@ import React from 'react'
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Slider from 'material-ui/Slider';
 import IconButton from 'material-ui/IconButton';
-// import * as ColorTones from 'material-ui/styles/colors'
-import { fade } from 'material-ui/utils/colorManipulator'
-import { Color, ColorHelper } from '../../utils/Color'
+
+import { ColorInfo, ColorHelper } from '../../utils/ColorHelper'
 
 
 const multiplier = 1.5;
@@ -149,41 +148,35 @@ export default class ColorPicker extends React.Component {
         super(props);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
-        // let parsedColor = parseColor(props.color);
-        // let { colorTone, alpha } = parsedColor;
-
-        let color = new Color(props.color);
-        let colorTone = color.colorTone;
+        let colorInfo = new ColorInfo(props.color);
 
         this.state = {
             initColor: props.color,
-            color: colorTone && colorTone.color,
-            tone: colorTone && colorTone.tone,
-            alpha: this._color.a
+            colorInfo
         }
     }
 
-    changeColorTone = (color = this.state.color, tone = this.state.tone) => {
-        if (!!color) {
-            this.setState({ color, tone });
-            this.propagateColorChange(color, tone);
-        }
+    changeColor = (color) => {
+        let { colorInfo } = this.state;
+        colorInfo.parse(color + colorInfo.colorTone && colorInfo.colorTone.tone);
+        this.propagateColorChange(colorInfo);
+    }
+
+    changeTone = (color, tone) => {
+        let { colorInfo } = this.state;
+        colorInfo.parse(color + tone);
+        this.propagateColorChange(colorInfo);
     }
 
     changeAlpha = (alpha) => {
-        this.setState({ alpha });
+        let { colorInfo } = this.state;
+        colorInfo.setAlpha(alpha);
+        this.propagateColorChange(colorInfo);
     }
 
-    propagateColorChange = (color = this.state.color, tone = this.state.tone, alpha = this.state.alpha) => {
-        // var newColorTone = colorToneList[color][tone];
-        // if (!!newColorTone && this.props.onColorChange) {
-        //     var newColor = alpha != 1 ? fade(newColorTone, alpha) : newColorTone;
-        //     this.props.onColorChange(newColor);
-        // }
-
-        this._color.parse(color + tone);
-        this._color.a = alpha;
-        this.props.onColorChange(this._color);
+    propagateColorChange = (colorInfo) => {
+        this.setState({ colorInfo });
+        this.props.onColorChange(colorInfo);
     }
 
     generateColorSelector = () => {
@@ -198,7 +191,7 @@ export default class ColorPicker extends React.Component {
                                 backgroundColor: colorToneList[color][Object.keys(ColorHelper.colorToneList[color])[5]],
                                 height: (color === this.state.color ? multiplier : 1) * styles.button.color.height
                             }}
-                            onClick={() => this.changeColorTone(color)}
+                            onClick={() => this.changeColor(color)}
                             tooltip={color}
                             tooltipPosition="top-center"
                         />
@@ -222,7 +215,7 @@ export default class ColorPicker extends React.Component {
                                 backgroundColor: colorToneList[color][tone],
                                 height: (tone === this.state.tone ? multiplier : 1) * styles.button.tone.height
                             }}
-                            onClick={() => this.changeColorTone(color, tone)}
+                            onClick={() => this.changeTone(color, tone)}
                             tooltip={tone}
                             tooltipPosition="bottom-center"
                         />
