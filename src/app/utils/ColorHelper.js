@@ -1,49 +1,45 @@
 import * as ColorTones from 'material-ui/styles/colors'
 
+
 export class ColorTone {
     color;
     tone;
 
     constructor(value) {
         let colorTone = ColorHelper.colorToneRegex.exec(value);
-        var color = colorTone[1];
-        var tone = colorTone[2];
-
-        if (color && !tone) {
-            tone = color;
-            color = ' ';
-        }
+        this.tone = colorTone[2] || colorTone[1];
+        this.color = colorTone[2] && colorTone[1] || '';
     }
 
     get() {
-        return ((color || "") + (tone || "")).trim();
+        return ((this.color || "") + (this.tone || "")).trim();
     }
 }
 
-export class RbgaColor {
+export class RgbaColor {
     r;
-    b;
     g;
+    b;
     a;
 
-    constructor(r, b, g, a = 1) {
+    constructor(r, g, b, a = 1) {
         this.r = r;
-        this.b = b;
         this.g = g;
+        this.b = b;
         this.a = a;
     }
 
     get() {
-        return `rbga(${this.r}, ${this.b}, ${this.g}, ${this.a})`;
+        return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
     }
 
     getHex() {
-        return "#" + ("00000" + (r << 16 | g << 8 | b).toString(16)).slice(-6);
+        return "#" + ("00000" + (this.r << 16 | this.g << 8 | this.b).toString(16)).slice(-6);
     }
 }
 
 export class ColorInfo {
-    rbga;
+    rgba;
     colorTone;
 
     constructor(value) {
@@ -52,7 +48,7 @@ export class ColorInfo {
 
     parse(value) {
         value = (value || "").trim();
-        this.rbga = null;
+        this.rgba = null;
         this.colorTone = null;
 
         if (!!value) {
@@ -73,27 +69,31 @@ export class ColorInfo {
     }
 
     setAlpha(alpha) {
-        this.rbga.a = alpha || this.rbga.a || 1;
-        this.resetKey();
+        this.rgba.a = alpha || this.rgba.a || 1;
     }
 
     setHex(hex) {
-        this.rbga = ColorHelper.parseHex(hex);
+        this.rgba = ColorHelper.parseHex(hex);
         this.resetKey();
     }
 
-    setRgba(rbga) {
-        this.rbga = ColorHelper.parseRbga(rbga);
+    setRgba(rgba) {
+        this.rgba = ColorHelper.parseRgba(rgba);
         this.resetKey();
     }
 
     resetKey() {
         this.colorTone =
-            ColorHelper.reverseColorMap[this.rbga.get()] ||
-            ColorHelper.reverseColorMap[this.rbga.getHex()] ||
-            null;
+            ColorHelper.reverseColorMap[this.get()] ||
+            ColorHelper.reverseColorMap[this.rgba.getHex()] ||
+            {};
+    }
+
+    get() {
+        return this.rgba.a == 1 ? this.rgba.getHex() : this.rgba.get();
     }
 }
+
 
 
 export class ColorHelper {
@@ -101,27 +101,41 @@ export class ColorHelper {
     static rgbaRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
     static colorToneRegex = /^([^#][^A\d]+)([A?\d]+)?$/;
 
-    colorToneList = Object.keys(ColorTones).reduce((result, value) => {
+
+    static reverseColorMap = (() => Object.keys(ColorTones).reduce((result, key) => {
+        var value = ColorTones[key];
+        result[value] = new ColorTone(key);
+        return result;
+    }, {}))();
+
+    static colorToneList = (() => Object.keys(ColorTones).reduce((result, value) => {
         var colorInfo = new ColorInfo(value);
-        var color = colorInfo.color;
-        var tone = colorInfo.tone;
+        var color = colorInfo.colorTone.color;
+        var tone = colorInfo.colorTone.tone;
 
         result[color] = result[color] || {};
         result[color][tone] = colorInfo;
 
         return result;
-    }, {});
+    }, {}))();
 
-    reverseColorMap = Object.keys(ColorTones).reduce((result, key) => {
-        var value = ColorTones[key];
-        result[value] = new ColorTone(key);
-        return result;
-    }, {});
+    static getDefaultColor(colorInfo) {
+        var colorInfo = ColorHelper.colorToneList[colorInfo]["500"];
 
-    static parseRbga(rbga) {
-        let result = ColorHelper.rgbaRegex.exec(rbga);
+        return colorInfo && colorInfo.get() || "#fff";
+    }
 
-        return new RbgaColor(result[1], result[2], result[3], result[4]);
+    static parseNumber(number) {
+        return parseFloat(number) || 0;
+    }
+
+    static parseRgba(rgba) {
+        let result = ColorHelper.rgbaRegex.exec(rgba);
+        return new RgbaColor(
+            ColorHelper.parseNumber(result[1]),
+            ColorHelper.parseNumber(result[2]),
+            ColorHelper.parseNumber(result[3]),
+            ColorHelper.parseNumber(result[4]));
     };
 
     static parseHex(hex) {
@@ -131,6 +145,6 @@ export class ColorHelper {
         vw.setUint32(0, parseInt(hex, 16), false);
         let arrByte = new Uint8Array(arrBuff);
 
-        return new RbgaColor(arrByte[1], arrByte[2], arrByte[3]);
+        return new RgbaColor(arrByte[1], arrByte[2], arrByte[3]);
     };
 }

@@ -59,88 +59,6 @@ const styles = {
     }
 };
 
-// const parseColorTone = (key) => {
-//     if (!key || !ColorTones[key])
-//         return null;
-
-//     var test = /([^A\d]+)([A?\d]+)?/.exec(key);
-//     var color = test[1];
-//     var tone = test[2];
-
-//     if (color && !tone) {
-//         tone = color;
-//         color = ' ';
-//     }
-
-//     return { color, tone, key, value: ColorTones[key] };
-// }
-
-// const colorToneList = Object.keys(ColorTones).reduce((result, colorTone) => {
-//     var parseResult = parseColorTone(colorTone);
-//     var color = parseResult.color;
-//     var tone = parseResult.tone;
-//     var value = parseResult.value;
-
-//     result[color] = result[color] || {};
-//     result[color][tone] = value;
-
-//     return result;
-// }, {});
-
-
-// export const reverseColorMap = Object.keys(ColorTones).reduce((result, key) => {
-//     let value = ColorTones[key];
-//     result[value] = key;
-//     return result;
-// }, {});
-
-
-// const rgbaToHex = (value) => {
-//     if (/#/.test(value))
-//         return value;
-
-//     let matches = value.match(/[\d\.]+/g);
-
-//     if (matches.length < 3)
-//         return {};
-
-//     let r = matches[0];
-//     let g = matches[1];
-//     let b = matches[2];
-//     let a = matches[3];
-
-//     return {
-//         color: '#' + [r, g, b].map(x => {
-//             const hex = Number(x).toString(16)
-//             return hex.length === 1 ? '0' + hex : hex
-//         }).join(''),
-//         alpha: a
-//     };
-// };
-
-// export const parseColor = (value) => {
-//     let colorTone = null;
-//     let alpha = 1;
-
-//     if (value) {
-//         let reverse = reverseColorMap[value];
-//         if (reverse) {
-//             colorTone = parseColorTone(reverse);
-//         }
-//         else {
-//             let rbga = rgbaToHex(value);
-//             if (rbga.color) {
-//                 colorTone = parseColor(rbga.color).colorTone;
-//                 alpha = rbga.alpha || alpha;
-//             }
-//         }
-//     }
-
-//     return {
-//         colorTone, alpha
-//     };
-// }
-
 
 export default class ColorPicker extends React.Component {
 
@@ -149,16 +67,24 @@ export default class ColorPicker extends React.Component {
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
         let colorInfo = new ColorInfo(props.color);
+        let alpha = colorInfo.rgba.a;
 
         this.state = {
-            initColor: props.color,
-            colorInfo
+            colorInfo,
+            alpha
         }
     }
 
     changeColor = (color) => {
         let { colorInfo } = this.state;
-        colorInfo.parse(color + colorInfo.colorTone && colorInfo.colorTone.tone);
+
+        try {
+            colorInfo.parse(color + (colorInfo.colorTone && colorInfo.colorTone.tone));
+        }
+        catch (e) {
+            colorInfo.parse(color + Object.keys(ColorHelper.colorToneList[color])[5]);
+        }
+
         this.propagateColorChange(colorInfo);
     }
 
@@ -170,16 +96,19 @@ export default class ColorPicker extends React.Component {
 
     changeAlpha = (alpha) => {
         let { colorInfo } = this.state;
-        colorInfo.setAlpha(alpha);
-        this.propagateColorChange(colorInfo);
+        colorInfo = colorInfo.setAlpha(alpha);
+        this.setState({ alpha });
     }
 
     propagateColorChange = (colorInfo) => {
         this.setState({ colorInfo });
-        this.props.onColorChange(colorInfo);
+        this.props.onColorChange(colorInfo.get());
     }
 
     generateColorSelector = () => {
+        let { colorInfo } = this.state;
+        let selectedColor = colorInfo.colorTone && colorInfo.colorTone.color;
+
         return (
             <div style={{ ...styles.container.color, height: styles.button.color.height * multiplier }} >
                 {
@@ -188,8 +117,8 @@ export default class ColorPicker extends React.Component {
                             key={color}
                             style={{
                                 ...styles.button.color,
-                                backgroundColor: colorToneList[color][Object.keys(ColorHelper.colorToneList[color])[5]],
-                                height: (color === this.state.color ? multiplier : 1) * styles.button.color.height
+                                backgroundColor: ColorHelper.getDefaultColor(color),
+                                height: (color === selectedColor ? multiplier : 1) * styles.button.color.height
                             }}
                             onClick={() => this.changeColor(color)}
                             tooltip={color}
@@ -202,20 +131,22 @@ export default class ColorPicker extends React.Component {
     }
 
     generateToneSelector = () => {
-        var color = this.state.color;
+        let { colorInfo } = this.state;
+        let colorState = colorInfo.colorTone && colorInfo.colorTone.color;
+        let toneState = colorInfo.colorTone && colorInfo.colorTone.tone;
 
         return (
             <div style={{ ...styles.container.tone, height: styles.button.tone.height * multiplier }}>
                 {
-                    Object.keys(colorToneList[color]).map(tone =>
+                    Object.keys(ColorHelper.colorToneList[colorState]).map(tone =>
                         <IconButton
                             key={tone}
                             style={{
                                 ...styles.button.tone,
-                                backgroundColor: colorToneList[color][tone],
-                                height: (tone === this.state.tone ? multiplier : 1) * styles.button.tone.height
+                                backgroundColor: ColorHelper.colorToneList[colorState][tone].get(),
+                                height: (tone === toneState ? multiplier : 1) * styles.button.tone.height
                             }}
-                            onClick={() => this.changeTone(color, tone)}
+                            onClick={() => this.changeTone(colorState, tone)}
                             tooltip={tone}
                             tooltipPosition="bottom-center"
                         />
@@ -230,23 +161,26 @@ export default class ColorPicker extends React.Component {
             min={0}
             max={1}
             step={0.01}
-            value={this.state.alpha}
+            value={this.state.colorInfo.rgba.a}
             onChange={(e, value) => this.changeAlpha(value)}
-            onDragStop={e => this.propagateColorChange()}
+            onDragStop={e => this.propagateColorChange(this.state.colorInfo)}
             style={styles.container.alphaValue}
             sliderStyle={styles.container.alphaSlider}
         />
     );
 
     render() {
+        let tone = ((this.state.colorInfo || {}).colorTone || {}).tone;
+        let { alpha } = this.state;
+
         return (
             <div style={styles.container.main}>
                 {this.generateColorSelector()}
-                {this.state.color ? this.generateToneSelector() : null}
-                {this.state.color ?
+                {tone ? this.generateToneSelector() : null}
+                {tone ?
                     <div style={styles.container.alpha}>
                         {this.generateAlphaSelector()}
-                        <div style={styles.container.alphaText}>{this.state.alpha}</div>
+                        <div style={styles.container.alphaText}>{alpha}</div>
                     </div> : null
                 }
             </div>
