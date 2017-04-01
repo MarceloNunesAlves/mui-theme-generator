@@ -10,15 +10,18 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import Toggle from 'material-ui/Toggle';
 import Snackbar from 'material-ui/Snackbar';
 
-import { parseColor } from '../ThemeSelector/ColorPicker'
+import { ColorInfo } from '../../utils/ColorHelper'
 
 
 const mapColorsToColorTone = (data) => {
     if (typeof data === "string") {
-        let { colorTone, alpha } = parseColor(data);
-        if (colorTone.key) {
-            let color = "Colors." + colorTone.key;
-            if (alpha !== 1)
+        let colorInfo = new ColorInfo(data);
+        let colorTone = colorInfo.colorTone;
+        let alpha = colorInfo.rgba.a;
+        
+        if (colorTone) {
+            let color = "Colors." + colorTone.get();
+            if (alpha != 1)
                 return `fade(${color}, ${alpha})`;
             return color;
         }

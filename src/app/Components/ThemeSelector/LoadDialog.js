@@ -5,6 +5,10 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Snackbar from 'material-ui/Snackbar';
 
+import { fade } from 'material-ui/utils/colorManipulator'
+// import { ColorHelper } from '../../utils/ColorHelper'
+import * as ColorTones from 'material-ui/styles/colors'
+
 
 export class LoadDialog extends React.Component {
     constructor() {
@@ -38,10 +42,19 @@ export class LoadDialog extends React.Component {
         this.setState({ snackOpen: true });
     }
 
+    parseColorTone = (colorTone) => {
+        if (ColorTones[colorTone])
+            return ColorTones[colorTone];
+        throw new Error("Invalid color code: " + colorTone);
+    }
+
     handleChange = (event) => {
         var errorText = null;
         var value = event.target.value;
         try {
+            value = value
+                .replace(/(Colors\.)(\w+)/g, (match, $1, $2) => '"' + this.parseColorTone($2) + '"')
+                .replace(/(fade\(\"(.+)\"\s*,\s*(.+)\))/g, (match, $1, $2, $3) => '"' + fade($2, $3) + '"');
             value = JSON.parse(value);
             if (typeof value !== "object") {
                 throw new Error("Not valid object");

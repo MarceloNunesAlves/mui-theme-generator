@@ -137,7 +137,7 @@ export default class Main extends React.Component {
         let overwrites = this.state.overwrites || {};
         let muiTheme = getMuiTheme(themeBase, overwrites);
 
-        let { palette, baseTheme, rawTheme, isRtl, fontFamily, ...components } = muiTheme;
+        let { palette, baseTheme, rawTheme, isRtl, fontFamily, prepareStyles, ...components } = muiTheme;
 
         let topBar = <TopBar
             changeBaseTheme={this.handleBaseThemeChange}
