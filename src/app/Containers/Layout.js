@@ -6,7 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 const styles = {
     toolbar: {
         position: 'fixed',
-        zIndex: 1500,
+        zIndex: 2000,
         height: 65,
         width: '100%'
     },
@@ -27,7 +27,8 @@ const styles = {
     rightFixed: {
         position: 'fixed',
         height: '100%',
-        width: 'inherit'
+        width: 'inherit',
+        zIndex: 2000
     },
     rightScrollContent: {
         position: 'absolute',
