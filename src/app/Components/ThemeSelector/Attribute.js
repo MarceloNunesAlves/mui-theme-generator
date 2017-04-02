@@ -44,7 +44,7 @@ export const createAttributes = (object, overwrites, addToOverwrites, removeFrom
         let overwriteSelector = [...overwriteSelectorParent, key];
 
         if (!!overwriteParent[key]) {
-            left = <IconButton style={styles.container.listItem.leftIcon} onTouchTap={e => removeFromOverwrites(overwriteSelector)}><DeleteIcon /></IconButton>
+            left = <IconButton style={styles.container.listItem.leftIcon} iconStyle={{ color: 'gray' }} onTouchTap={e => removeFromOverwrites(overwriteSelector)}><DeleteIcon /></IconButton>
         }
 
         switch (type) {
@@ -72,7 +72,7 @@ export const createAttributes = (object, overwrites, addToOverwrites, removeFrom
             default:
                 return null;
         }
-        
+
         return (
             <ListItem
                 key={key}
