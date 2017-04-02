@@ -27,8 +27,7 @@ const styles = {
     rightFixed: {
         position: 'fixed',
         height: '100%',
-        width: 'inherit',
-        zIndex: 2000
+        width: 'inherit'
     },
     rightScrollContent: {
         position: 'absolute',

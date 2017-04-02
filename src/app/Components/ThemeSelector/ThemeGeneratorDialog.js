@@ -119,7 +119,6 @@ export class ThemeGeneratorDialog extends React.Component {
                     open={open}
                     onRequestClose={handleClose}
                     autoScrollBodyContent={true}
-                    contentStyle={{ marginTop: -120 }}
                 >
                     <pre>
                         {
