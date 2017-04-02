@@ -69,7 +69,7 @@ export class ColorInfo {
     }
 
     setAlpha(alpha) {
-        this.rgba.a = alpha || this.rgba.a || 1;
+        this.rgba.a = alpha || this.getAlpha() || 1;
     }
 
     setHex(hex) {
@@ -89,8 +89,12 @@ export class ColorInfo {
             {};
     }
 
+    getAlpha() {
+        return this.rgba.a;
+    }
+
     get() {
-        return this.rgba.a == 1 ? this.rgba.getHex() : this.rgba.get();
+        return this.getAlpha() == 1 ? this.rgba.getHex() : this.rgba.get();
     }
 }
 

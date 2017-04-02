@@ -15,7 +15,7 @@ const styles = {
             zIndex: 2,
             display: 'flex',
             flexDirection: 'column',
-            padding: '5px 14px',
+            padding: '5px 14px 14px',
             marginLeft: 32,
             backgroundColor: 'rgba(125, 125, 125, 0.12)'
         },
@@ -39,7 +39,9 @@ const styles = {
             flex: 90
         },
         alphaSlider: {
-            margin: '10px 0'
+            // margin: 0,
+            marginTop: 10,
+            marginBottom: 0
         }
     },
     button: {
@@ -77,6 +79,7 @@ export default class ColorPicker extends React.Component {
 
     changeColor = (color) => {
         let { colorInfo } = this.state;
+        let previousColor = colorInfo.colorTone && colorInfo.colorTone.color;
 
         try {
             colorInfo.parse(color + (colorInfo.colorTone && colorInfo.colorTone.tone));
@@ -85,17 +88,35 @@ export default class ColorPicker extends React.Component {
             colorInfo.parse(color + Object.keys(ColorHelper.colorToneList[color])[5]);
         }
 
-        this.propagateColorChange(colorInfo);
+        this.propagateColorChange(previousColor);
     }
 
     changeTone = (color, tone) => {
         let { colorInfo } = this.state;
+        let previousColor = colorInfo.colorTone && colorInfo.colorTone.color;
+
         colorInfo.parse(color + tone);
-        this.propagateColorChange(colorInfo);
+
+        this.propagateColorChange(previousColor);
     }
 
-    propagateColorChange = (colorInfo) => {
-        colorInfo.setAlpha(this.state.alpha);
+    changeAlpha = (alpha) => {
+        let { colorInfo } = this.state;
+        colorInfo.setAlpha(alpha);
+        this.setState({ alpha });
+    }
+
+    propagateColorChange = (previousColor) => {
+        let { colorInfo, alpha } = this.state;
+        let currentColor = colorInfo.colorTone && colorInfo.colorTone.color;
+        if (previousColor != undefined) {
+            if (currentColor == "")
+                alpha = colorInfo.getAlpha();
+            else if (previousColor == "")
+                alpha = 1;
+        }
+
+        this.changeAlpha(alpha);
         this.setState({ colorInfo });
         this.props.onColorChange(colorInfo.get());
     }
@@ -143,7 +164,7 @@ export default class ColorPicker extends React.Component {
                             }}
                             onClick={() => this.changeTone(colorState, tone)}
                             tooltip={tone}
-                            tooltipPosition="bottom-center"
+                            tooltipPosition="middle-center"
                         />
                     )
                 }
@@ -158,7 +179,7 @@ export default class ColorPicker extends React.Component {
             step={0.01}
             value={alpha}
             onChange={(e, alpha) => this.setState({ alpha })}
-            onDragStop={e => this.propagateColorChange(this.state.colorInfo)}
+            onDragStop={e => this.propagateColorChange()}
             style={styles.container.alphaValue}
             sliderStyle={styles.container.alphaSlider}
         />

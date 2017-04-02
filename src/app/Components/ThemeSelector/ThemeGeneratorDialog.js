@@ -17,7 +17,7 @@ const mapColorsToColorTone = (data) => {
     if (typeof data === "string") {
         let colorInfo = new ColorInfo(data);
         let colorTone = colorInfo.colorTone;
-        let alpha = colorInfo.rgba.a;
+        let alpha = colorInfo.getAlpha();
         
         if (colorTone) {
             let color = "Colors." + colorTone.get();
