@@ -94,13 +94,8 @@ export default class ColorPicker extends React.Component {
         this.propagateColorChange(colorInfo);
     }
 
-    changeAlpha = (alpha) => {
-        let { colorInfo } = this.state;
-        colorInfo = colorInfo.setAlpha(alpha);
-        this.setState({ alpha });
-    }
-
     propagateColorChange = (colorInfo) => {
+        colorInfo.setAlpha(this.state.alpha);
         this.setState({ colorInfo });
         this.props.onColorChange(colorInfo.get());
     }
@@ -156,13 +151,13 @@ export default class ColorPicker extends React.Component {
         );
     }
 
-    generateAlphaSelector = () => (
+    generateAlphaSelector = (alpha) => (
         <Slider
             min={0}
             max={1}
             step={0.01}
-            value={this.state.colorInfo.rgba.a}
-            onChange={(e, value) => this.changeAlpha(value)}
+            value={alpha}
+            onChange={(e, alpha) => this.setState({ alpha })}
             onDragStop={e => this.propagateColorChange(this.state.colorInfo)}
             style={styles.container.alphaValue}
             sliderStyle={styles.container.alphaSlider}
@@ -179,7 +174,7 @@ export default class ColorPicker extends React.Component {
                 {tone ? this.generateToneSelector() : null}
                 {tone ?
                     <div style={styles.container.alpha}>
-                        {this.generateAlphaSelector()}
+                        {this.generateAlphaSelector(alpha)}
                         <div style={styles.container.alphaText}>{alpha}</div>
                     </div> : null
                 }
